@@ -1,4 +1,5 @@
-import { useFetcher } from "@remix-run/react";
+import { Link, useFetcher } from "@remix-run/react";
+import { Package2Icon, User } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -20,10 +21,10 @@ export function Navbar() {
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-gray-100/40 px-6 dark:bg-gray-800/40 [grid-area:header]">
-      {/* <Link className="lg:hidden" href="#">
-    <Package2Icon className="h-6 w-6" />
-    <span className="sr-only">Home</span>
-  </Link> */}
+      <Link className="lg:hidden" to="/">
+        <Package2Icon className="h-6 w-6" />
+        <span className="sr-only">Home</span>
+      </Link>
       {/* <div className="w-full flex-1">
     <form>
       <div className="relative">
@@ -46,7 +47,8 @@ export function Navbar() {
                 size="icon"
                 variant="ghost"
               >
-                <img
+                <User className="h-4 w-4" />
+                {/* <img
                   alt="Avatar"
                   className="rounded-full"
                   height="32"
@@ -56,7 +58,7 @@ export function Navbar() {
                     objectFit: "cover",
                   }}
                   width="32"
-                />
+                /> */}
                 <span className="sr-only">Toggle user menu</span>
               </Button>
             </DropdownMenuTrigger>
