@@ -20,6 +20,8 @@ model User {
   lastName     String?
   passwordHash String
   transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 enum TransactionDirection {
@@ -34,4 +36,6 @@ model Transaction {
   direction TransactionDirection
   user      User                 @relation(fields: [userId], references: [id])
   userId    Int
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
 }
