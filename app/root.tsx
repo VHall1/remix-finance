@@ -23,7 +23,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="dark">
         {/* Move somewhere else */}
         <div className="grid h-screen [grid-template-columns:minmax(max-content,12.8125rem)_1fr] [grid-template-rows:max-content_max-content_1fr_max-content] [grid-template-areas:'logo_header''aside_main']">
           <Link
