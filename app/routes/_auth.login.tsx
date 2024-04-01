@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
+import { getUserSession } from "~/services/auth.server";
 
 export default function Login() {
   const lastResult = useActionData<typeof action>();
@@ -83,5 +84,16 @@ export async function action({ request }: ActionFunctionArgs) {
     return json(submission.reply());
   }
 
-  return redirect("/dashboard");
+  const session = await getUserSession(request);
+  // TODO: fetch from prisma
+  session.setUser({
+    id: 1,
+    firstName: "Victor",
+    lastName: "Hall",
+    email: "test@example.com",
+  });
+
+  return redirect("/", {
+    headers: { "Set-Cookie": await session.commit() },
+  });
 }

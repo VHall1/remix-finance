@@ -5,9 +5,12 @@ import { getUserSession } from "~/services/auth.server";
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
-  const userSession = await getUserSession(request);
-  userSession.setUser(undefined);
-  return json(undefined, {
-    headers: { "Set-Cookie": await userSession.commit() },
-  });
+  const session = await getUserSession(request);
+  session.setUser(undefined);
+  return json(
+    {},
+    {
+      headers: { "Set-Cookie": await session.commit() },
+    }
+  );
 };
