@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
+import { getUserSession } from "~/services/auth.server";
+import { prisma } from "~/services/prisma.server";
 
 export default function SignUp() {
   const lastResult = useActionData<typeof action>();
@@ -137,5 +139,29 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  return redirect("/dashboard");
+  // TODO: Handle if email is taken
+  const [session, user] = await Promise.all([
+    getUserSession(request),
+    prisma.user.create({
+      data: {
+        firstName: submission.value.firstName,
+        lastName: submission.value.lastName,
+        email: submission.value.email,
+        // TODO: Hash password before saving!
+        passwordHash: submission.value.password,
+      },
+    }),
+  ]);
+
+  // don't send down hashed password
+  session.setUser({
+    id: user.id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+  });
+
+  return redirect("/dashboard", {
+    headers: { "Set-Cookie": await session.commit() },
+  });
 }

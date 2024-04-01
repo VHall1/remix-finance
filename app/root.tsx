@@ -1,3 +1,4 @@
+import { LoaderFunctionArgs } from "@remix-run/node";
 import {
   Link,
   Links,
@@ -6,6 +7,8 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  json,
+  useLoaderData,
   useRouteError,
 } from "@remix-run/react";
 import { Button } from "./components/ui/button";
@@ -17,9 +20,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./components/ui/dropdown-menu";
+import { AuthProvider } from "./context/auth";
 import "./globals.css";
+import { getUserSession } from "./services/auth.server";
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const { user } = useLoaderData<typeof loader>();
+
   return (
     <html lang="en">
       <head>
@@ -29,20 +36,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {/* Move somewhere else */}
-        <div className="grid h-screen [grid-template-columns:minmax(max-content,12.8125rem)_1fr] [grid-template-rows:max-content_max-content_1fr_max-content] [grid-template-areas:'logo_header''aside_main']">
-          <Link
-            to="/"
-            className="border-b border-r bg-gray-100/40 px-6 dark:bg-gray-800/40 [grid-area:logo]"
-          >
-            home
-          </Link>
-          <header className="flex h-14 items-center gap-4 border-b bg-gray-100/40 px-6 dark:bg-gray-800/40 [grid-area:header]">
-            {/* <Link className="lg:hidden" href="#">
+        <AuthProvider user={user}>
+          {/* Move somewhere else */}
+          <div className="grid h-screen [grid-template-columns:minmax(max-content,12.8125rem)_1fr] [grid-template-rows:max-content_max-content_1fr_max-content] [grid-template-areas:'logo_header''aside_main']">
+            <Link
+              to="/"
+              className="border-b border-r bg-gray-100/40 px-6 dark:bg-gray-800/40 [grid-area:logo]"
+            >
+              home
+            </Link>
+            <header className="flex h-14 items-center gap-4 border-b bg-gray-100/40 px-6 dark:bg-gray-800/40 [grid-area:header]">
+              {/* <Link className="lg:hidden" href="#">
               <Package2Icon className="h-6 w-6" />
               <span className="sr-only">Home</span>
             </Link> */}
-            {/* <div className="w-full flex-1">
+              {/* <div className="w-full flex-1">
               <form>
                 <div className="relative">
                   <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
@@ -54,43 +62,43 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </div>
               </form>
             </div> */}
-            <div className="ml-auto">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    className="rounded-full border border-gray-200 w-8 h-8 dark:border-gray-800"
-                    id="menu"
-                    size="icon"
-                    variant="ghost"
-                  >
-                    <img
-                      alt="Avatar"
-                      className="rounded-full"
-                      height="32"
-                      src="/placeholder.svg"
-                      style={{
-                        aspectRatio: "32/32",
-                        objectFit: "cover",
-                      }}
-                      width="32"
-                    />
-                    <span className="sr-only">Toggle user menu</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
-                  <DropdownMenuItem>Support</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Logout</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </header>
-          <nav className="h-screen border-r bg-gray-100/40 lg:block dark:bg-gray-800/40 [grid-area:aside]">
-            <div className="flex h-[60px] items-center px-6">
-              {/* <Link
+              <div className="ml-auto">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      className="rounded-full border border-gray-200 w-8 h-8 dark:border-gray-800"
+                      id="menu"
+                      size="icon"
+                      variant="ghost"
+                    >
+                      <img
+                        alt="Avatar"
+                        className="rounded-full"
+                        height="32"
+                        // src="/placeholder.svg"
+                        style={{
+                          aspectRatio: "32/32",
+                          objectFit: "cover",
+                        }}
+                        width="32"
+                      />
+                      <span className="sr-only">Toggle user menu</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Settings</DropdownMenuItem>
+                    <DropdownMenuItem>Support</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Logout</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </header>
+            <nav className="h-screen border-r bg-gray-100/40 lg:block dark:bg-gray-800/40 [grid-area:aside]">
+              <div className="flex h-[60px] items-center px-6">
+                {/* <Link
                   className="flex items-center gap-2 font-semibold"
                   href="#"
                 >
@@ -136,14 +144,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <TrendingDownIcon className="h-4 w-4" />
                     Debt
                   </Link> */}
-            </div>
-          </nav>
-          <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 [grid-area:main]">
-            {children}
-          </main>
-          <ScrollRestoration />
-          <Scripts />
-        </div>
+              </div>
+            </nav>
+            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 [grid-area:main]">
+              {children}
+            </main>
+            <ScrollRestoration />
+            <Scripts />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );
@@ -151,6 +160,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return <Outlet />;
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { getUser } = await getUserSession(request);
+  const user = getUser();
+
+  return json({ user });
 }
 
 export function ErrorBoundary() {
