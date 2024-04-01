@@ -1,3 +1,4 @@
+name: remix-finance-dev
 services:
   postgres:
     image: postgres
