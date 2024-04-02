@@ -25,13 +25,6 @@ export function Shell({ children }: PropsWithChildren) {
             <BarChartHorizontal className="h-4 w-4" />
             Transactions
           </Link>
-          <Link
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            to={transactionsHandle.path()}
-          >
-            <BarChartHorizontal className="h-4 w-4" />
-            Transactions
-          </Link>
         </div>
       </nav>
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 [grid-area:main]">

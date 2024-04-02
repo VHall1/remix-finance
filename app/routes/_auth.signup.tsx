@@ -167,7 +167,6 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   const session = await getUserSession(request);
-  // don't send down password
   session.setUser({
     id: user.id,
     email: user.email,

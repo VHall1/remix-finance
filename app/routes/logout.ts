@@ -14,3 +14,7 @@ export const action: ActionFunction = async ({
     }
   );
 };
+
+export const handle = {
+  path: () => "/logout",
+};
