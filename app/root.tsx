@@ -12,9 +12,8 @@ import {
 import { BarChartHorizontal } from "lucide-react";
 import { Navbar } from "./components/navbar";
 import "./globals.css";
-import { handle as transactionsHandle } from "./routes/transactions";
+import { handle as transactionsHandle } from "./routes/transactions._index";
 import { getUserSession } from "./services/auth.server";
-import { CustomHandle } from "./types";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -40,14 +39,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <div className="flex-1 overflow-auto py-2">
               <Link
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-                to={transactionsHandle.id}
+                to={transactionsHandle.path()}
               >
                 <BarChartHorizontal className="h-4 w-4" />
                 Transactions
               </Link>
               <Link
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-                to={transactionsHandle.id}
+                to={transactionsHandle.path()}
               >
                 <BarChartHorizontal className="h-4 w-4" />
                 Transactions
@@ -69,8 +68,8 @@ export default function App() {
   return <Outlet />;
 }
 
-export const handle: CustomHandle = {
-  id: "root",
+export const handle = {
+  path: () => "root",
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {

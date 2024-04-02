@@ -1,29 +1,29 @@
-import { Link, useMatches } from "@remix-run/react";
+import { Link, Outlet } from "@remix-run/react";
 import { ArrowLeftIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { CustomHandle } from "~/types";
+import { handle as newTransactionHandle } from "./transactions_.new";
 
 export default function Transactions() {
-  const matches = useMatches();
-  console.log(matches);
-
   return (
-    <div className="flex items-center gap-4">
-      <Button size="icon" variant="outline" asChild>
-        <Link to="/">
-          <ArrowLeftIcon className="h-4 w-4" />
-          <span className="sr-only">Back</span>
-        </Link>
-      </Button>
-      <h1 className="font-semibold text-lg md:text-xl">Transactions</h1>
-      <div className="ml-auto flex items-center gap-2">
-        <Button>New transaction</Button>
+    <>
+      <div className="flex items-center gap-4">
+        <Button size="icon" variant="outline" asChild>
+          <Link to="/">
+            <ArrowLeftIcon className="h-4 w-4" />
+            <span className="sr-only">Back</span>
+          </Link>
+        </Button>
+        <h1 className="font-semibold text-lg md:text-xl">Transactions</h1>
+        <div className="ml-auto flex items-center gap-2">
+          <Button asChild>
+            <Link to={newTransactionHandle.path()}>New transaction</Link>
+          </Button>
+        </div>
       </div>
-    </div>
+      <Outlet />
+    </>
   );
 }
-
-export const handle: CustomHandle = { id: "transactions" };
 
 // <Button className="hidden sm:flex" variant="outline">
 //   Today
