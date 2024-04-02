@@ -3,7 +3,10 @@ import { redirect } from "@remix-run/node";
 import { sessionStorage } from "~/services/session.server";
 import * as bcrypt from "@node-rs/bcrypt";
 
-export type AuthUser = Pick<User, "id" | "firstName" | "lastName" | "email">;
+export type AuthUser = Pick<
+  User,
+  "id" | "firstName" | "lastName" | "email" | "avatar"
+>;
 
 export async function getUserSession(request: Request) {
   const session = await sessionStorage.getSession(

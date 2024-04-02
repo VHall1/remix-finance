@@ -251,6 +251,7 @@ export async function action({ request }: ActionFunctionArgs) {
     email: updatedUser.email,
     firstName: updatedUser.firstName,
     lastName: updatedUser.lastName,
+    avatar: null,
   });
 
   return json(submission.reply(), {

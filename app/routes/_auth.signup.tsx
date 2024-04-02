@@ -172,6 +172,7 @@ export async function action({ request }: ActionFunctionArgs) {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
+    avatar: null,
   });
 
   return redirect("/", {
