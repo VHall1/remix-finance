@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { useOptionalUser } from "~/hooks/useRootData";
+import { handle as logoutHandle } from "~/routes/logout";
 import { handle as profileHandle } from "~/routes/profile";
 
 export function Navbar() {
@@ -17,7 +18,7 @@ export function Navbar() {
   const fetcher = useFetcher();
 
   const logout = () => {
-    fetcher.submit({}, { action: "logout", method: "post" });
+    fetcher.submit({}, { action: logoutHandle.path(), method: "post" });
   };
 
   return (
