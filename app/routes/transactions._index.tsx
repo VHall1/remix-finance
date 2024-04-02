@@ -2,7 +2,7 @@ export default function Transactions() {
   return <p>testing</p>;
 }
 
-export const handle = { path: () => "transactions" };
+export const handle = { path: () => "/transactions" };
 
 // <Button className="hidden sm:flex" variant="outline">
 //   Today
