@@ -16,7 +16,7 @@ import {
 } from "~/components/ui/select";
 import { requireUser } from "~/services/auth.server";
 import { prisma } from "~/services/prisma.server";
-import { handle as showTransactionHandle } from "./transactions.$transactionId.show";
+import { handle as showTransactionHandle } from "./transactions.$transactionId";
 
 export default function NewTransaction() {
   const lastResult = useActionData<typeof action>();
