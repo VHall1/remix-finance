@@ -10,7 +10,7 @@ export default function Transaction() {
 }
 
 export const handle = {
-  path: (transactionId: number) => `/transactions/${transactionId}/show`,
+  path: (transactionId: number) => `/transactions/${transactionId}`,
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
