@@ -8,7 +8,7 @@ import { CardContent, CardHeader } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
-import { getUserSession } from "~/services/auth.server";
+import { getUserSession, hashPassword } from "~/services/auth.server";
 import { prisma } from "~/services/prisma.server";
 import { AuthCard } from "./_auth/auth-card";
 
@@ -91,8 +91,8 @@ export async function action({ request }: ActionFunctionArgs) {
     where: { email: submission.value.email },
   });
 
-  // TODO: hash submitted password
-  if (!user || user.passwordHash !== submission.value.password) {
+  const hashedPassword = await hashPassword(submission.value.password);
+  if (!user || user.passwordHash !== hashedPassword) {
     return json(
       submission.reply({
         formErrors: ["Email or password invalid"],

@@ -1,6 +1,7 @@
 import { User } from "@prisma/client";
 import { redirect } from "@remix-run/node";
 import { sessionStorage } from "~/services/session.server";
+import * as bcrypt from "bcrypt";
 
 export type AuthUser = Pick<User, "id" | "firstName" | "lastName" | "email">;
 
@@ -30,4 +31,9 @@ export async function requireUser(request: Request): Promise<AuthUser> {
   }
 
   return user;
+}
+
+const SALT_ROUNDS = 10;
+export function hashPassword(password: string) {
+  return bcrypt.hash(password, SALT_ROUNDS);
 }

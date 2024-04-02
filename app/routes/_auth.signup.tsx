@@ -9,7 +9,7 @@ import { CardContent, CardHeader } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
-import { getUserSession } from "~/services/auth.server";
+import { getUserSession, hashPassword } from "~/services/auth.server";
 import { prisma } from "~/services/prisma.server";
 import { AuthCard } from "./_auth/auth-card";
 
@@ -146,8 +146,7 @@ export async function action({ request }: ActionFunctionArgs) {
         firstName: submission.value.firstName,
         lastName: submission.value.lastName,
         email: submission.value.email,
-        // TODO: Hash password before saving!
-        passwordHash: submission.value.password,
+        passwordHash: await hashPassword(submission.value.password),
       },
     });
   } catch (error) {
