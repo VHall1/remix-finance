@@ -4,11 +4,13 @@ import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { CardContent, CardHeader } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { getUserSession } from "~/services/auth.server";
+import { prisma } from "~/services/prisma.server";
+import { AuthCard } from "./_auth/auth-card";
 
 export default function Login() {
   const lastResult = useActionData<typeof action>();
@@ -21,7 +23,7 @@ export default function Login() {
   });
 
   return (
-    <Card>
+    <AuthCard>
       <CardHeader>
         <h1 className="text-3xl font-bold text-center">Log In</h1>
       </CardHeader>
@@ -54,7 +56,7 @@ export default function Login() {
             </div>
 
             <Button>Log in</Button>
-            <div className="text-destructive">{form.errors}</div>
+            <div className="text-destructive text-center">{form.errors}</div>
           </div>
         </Form>
       </CardContent>
@@ -67,7 +69,7 @@ export default function Login() {
           </Button>
         </div>
       </CardContent>
-    </Card>
+    </AuthCard>
   );
 }
 
@@ -85,12 +87,24 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   const session = await getUserSession(request);
-  // TODO: fetch from prisma
+  const user = await prisma.user.findUnique({
+    where: { email: submission.value.email },
+  });
+
+  // TODO: hash submitted password
+  if (!user || user.passwordHash !== submission.value.password) {
+    return json(
+      submission.reply({
+        formErrors: ["Email or password invalid"],
+      })
+    );
+  }
+
   session.setUser({
-    id: 1,
-    firstName: "Victor",
-    lastName: "Hall",
-    email: "test@example.com",
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
   });
 
   return redirect("/", {

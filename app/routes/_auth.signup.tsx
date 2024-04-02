@@ -1,15 +1,17 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
+import { Prisma, User } from "@prisma/client";
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { CardContent, CardHeader } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { getUserSession } from "~/services/auth.server";
 import { prisma } from "~/services/prisma.server";
+import { AuthCard } from "./_auth/auth-card";
 
 export default function SignUp() {
   const lastResult = useActionData<typeof action>();
@@ -22,7 +24,7 @@ export default function SignUp() {
   });
 
   return (
-    <Card>
+    <AuthCard>
       <CardHeader>
         <h1 className="text-3xl font-bold text-center">Sign Up</h1>
       </CardHeader>
@@ -96,7 +98,7 @@ export default function SignUp() {
             </div>
 
             <Button>Sign up</Button>
-            <div className="text-destructive">{form.errors}</div>
+            <div className="text-destructive text-center">{form.errors}</div>
           </div>
         </Form>
       </CardContent>
@@ -109,7 +111,7 @@ export default function SignUp() {
           </Button>
         </div>
       </CardContent>
-    </Card>
+    </AuthCard>
   );
 }
 
@@ -132,17 +134,14 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.value.password !== submission.value.password2) {
     return json(
       submission.reply({
-        fieldErrors: {
-          password2: ["Passwords do not match"],
-        },
+        formErrors: ["Passwords do not match"],
       })
     );
   }
 
-  // TODO: Handle if email is taken
-  const [session, user] = await Promise.all([
-    getUserSession(request),
-    prisma.user.create({
+  let user: User;
+  try {
+    user = await prisma.user.create({
       data: {
         firstName: submission.value.firstName,
         lastName: submission.value.lastName,
@@ -150,10 +149,26 @@ export async function action({ request }: ActionFunctionArgs) {
         // TODO: Hash password before saving!
         passwordHash: submission.value.password,
       },
-    }),
-  ]);
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+      // (Unique constraint failed)
+      // https://www.prisma.io/docs/orm/reference/error-reference#p2002
+    ) {
+      return json(
+        submission.reply({
+          formErrors: ["This email address is not available"],
+        })
+      );
+    }
 
-  // don't send down hashed password
+    throw error;
+  }
+
+  const session = await getUserSession(request);
+  // don't send down password
   session.setUser({
     id: user.id,
     email: user.email,
@@ -161,7 +176,7 @@ export async function action({ request }: ActionFunctionArgs) {
     lastName: user.lastName,
   });
 
-  return redirect("/dashboard", {
+  return redirect("/", {
     headers: { "Set-Cookie": await session.commit() },
   });
 }

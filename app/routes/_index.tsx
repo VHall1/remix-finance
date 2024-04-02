@@ -2,6 +2,7 @@ import { $Enums } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
+import { Shell } from "~/components/shell";
 import {
   Card,
   CardContent,
@@ -16,7 +17,7 @@ export default function Dashboard() {
   const { transactions } = useLoaderData<typeof loader>();
 
   return (
-    <>
+    <Shell>
       <div className="flex items-center gap-4">
         <h1 className="font-semibold text-lg md:text-xl">Dashboard</h1>
       </div>
@@ -54,11 +55,10 @@ export default function Dashboard() {
           </div>
         </CardContent>
       </Card>
-    </>
+    </Shell>
   );
 }
 
-// TODO: maybe extract to a service?
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await requireUser(request);
   const recentTransactions = await prisma.transaction.findMany({

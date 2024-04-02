@@ -1,5 +1,5 @@
 import { useRouteLoaderData } from "@remix-run/react";
-import { handle, loader } from "../root";
+import { handle, loader } from "~/root";
 
 export const useRootData = () => useRouteLoaderData<typeof loader>(handle.id);
 
