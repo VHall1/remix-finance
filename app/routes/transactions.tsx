@@ -1,11 +1,12 @@
 import { Link, Outlet } from "@remix-run/react";
 import { ArrowLeftIcon } from "lucide-react";
+import { Shell } from "~/components/shell";
 import { Button } from "~/components/ui/button";
 import { handle as newTransactionHandle } from "./transactions_.new";
 
 export default function Transactions() {
   return (
-    <>
+    <Shell>
       <div className="flex items-center gap-4">
         <Button size="icon" variant="outline" asChild>
           <Link to="/">
@@ -21,7 +22,7 @@ export default function Transactions() {
         </div>
       </div>
       <Outlet />
-    </>
+    </Shell>
   );
 }
 

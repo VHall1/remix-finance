@@ -35,6 +35,7 @@ export default function App() {
 
 export const handle = {
   id: "root",
+  path: () => "/",
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {

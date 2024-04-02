@@ -3,12 +3,13 @@ import { BarChartHorizontal } from "lucide-react";
 import type { PropsWithChildren } from "react";
 import { Navbar } from "./navbar";
 import { handle as transactionsHandle } from "~/routes/transactions._index";
+import { handle as rootHandle } from "~/root";
 
 export function Shell({ children }: PropsWithChildren) {
   return (
     <div className="grid h-screen [grid-template-columns:minmax(max-content,12.8125rem)_1fr] [grid-template-rows:max-content_max-content_1fr_max-content] [grid-template-areas:'logo_header''aside_main']">
       <Link
-        to="root"
+        to={rootHandle.path()}
         className="border-b border-r bg-gray-100/40 px-6 dark:bg-gray-800/40 [grid-area:logo] flex items-center gap-2 font-semibold"
       >
         <BarChartHorizontal className="h-6 w-6" />
