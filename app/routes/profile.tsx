@@ -270,3 +270,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.user.firstName }];
 };
+
+export const handle = {
+  path: () => "/profile",
+};

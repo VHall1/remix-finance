@@ -1,5 +1,5 @@
 import { Link, useFetcher } from "@remix-run/react";
-import { Package2Icon, User } from "lucide-react";
+import { LogOut, Package2Icon, User } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { useOptionalUser } from "~/hooks/useRootData";
+import { handle as profileHandle } from "~/routes/profile";
 
 export function Navbar() {
   const user = useOptionalUser();
@@ -63,12 +64,27 @@ export function Navbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>{user.firstName}</DropdownMenuLabel>
+              <DropdownMenuLabel>
+                <div className="leading-6">
+                  {user.firstName} {user.lastName[0]}.
+                </div>
+                <div className="text-muted-foreground font-normal">
+                  {user.email}
+                </div>
+              </DropdownMenuLabel>
+
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to={profileHandle.path()}>
+                  <User className="h-4 w-4 mr-3" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={logout}>
+                <LogOut className="h-4 w-4 mr-3" />
+                Logout
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : null}
