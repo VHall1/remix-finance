@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import { redirect } from "@remix-run/node";
 import { sessionStorage } from "~/services/session.server";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "@node-rs/bcrypt";
 
 export type AuthUser = Pick<User, "id" | "firstName" | "lastName" | "email">;
 
