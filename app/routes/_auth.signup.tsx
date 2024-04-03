@@ -4,10 +4,9 @@ import { Prisma, User } from "@prisma/client";
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { z } from "zod";
+import { FormField } from "~/components/form-field";
 import { Button } from "~/components/ui/button";
 import { CardContent, CardHeader } from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { getUserSession, hashPassword } from "~/services/auth.server";
 import { prisma } from "~/services/prisma.server";
@@ -26,76 +25,47 @@ export default function SignUp() {
   return (
     <AuthCard>
       <CardHeader>
-        <h1 className="text-3xl font-bold text-center">Sign Up</h1>
+        <h1 className="text-3xl font-bold text-center">Sign up</h1>
       </CardHeader>
       <CardContent>
         <Form method="post" id={form.id} onSubmit={form.onSubmit}>
           <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor={fields.email.id}>Email</Label>
-              <Input
-                id={fields.email.id}
-                name={fields.email.name}
-                placeholder="hello@example.com"
-                type="email"
-                required
-              />
-              <small className="text-destructive">{fields.email.errors}</small>
-            </div>
+            <FormField
+              field={fields.email}
+              label="Email"
+              placeholder="hello@example.com"
+              type="email"
+              required
+            />
 
             <div className="flex gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor={fields.firstName.id}>First Name</Label>
-                <Input
-                  id={fields.firstName.id}
-                  name={fields.firstName.name}
-                  placeholder="John"
-                  required
-                />
-                <small className="text-destructive">
-                  {fields.firstName.errors}
-                </small>
-              </div>
-
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor={fields.lastName.id}>Last Name</Label>
-                <Input
-                  id={fields.lastName.id}
-                  name={fields.lastName.name}
-                  placeholder="Doe"
-                  required
-                />
-                <small className="text-destructive">
-                  {fields.lastName.errors}
-                </small>
-              </div>
-            </div>
-
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor={fields.password.id}>Password</Label>
-              <Input
-                id={fields.password.id}
-                name={fields.password.name}
-                type="password"
+              <FormField
+                field={fields.firstName}
+                label="First name"
+                placeholder="John"
                 required
               />
-              <small className="text-destructive">
-                {fields.password.errors}
-              </small>
-            </div>
-
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor={fields.password2.id}>Confirm password</Label>
-              <Input
-                id={fields.password2.id}
-                name={fields.password2.name}
-                type="password"
+              <FormField
+                field={fields.lastName}
+                label="Last name"
+                placeholder="Doe"
                 required
               />
-              <small className="text-destructive">
-                {fields.password2.errors}
-              </small>
             </div>
+
+            <FormField
+              field={fields.password}
+              label="Password"
+              type="password"
+              required
+            />
+
+            <FormField
+              field={fields.password2}
+              label="Confirm password"
+              type="password"
+              required
+            />
 
             <Button>Sign up</Button>
             <div className="text-destructive text-center">{form.errors}</div>
