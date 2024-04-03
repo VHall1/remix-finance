@@ -1,5 +1,16 @@
-import { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { LoaderFunctionArgs, SerializeFrom, json } from "@remix-run/node";
+import {
+  Link,
+  useLoaderData,
+  useLocation,
+  useNavigate,
+} from "@remix-run/react";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { ChevronDownIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
@@ -28,9 +39,43 @@ import { requireUser } from "~/services/auth.server";
 import { prisma } from "~/services/prisma.server";
 import { formatMoney } from "~/utils";
 
+const columnHelper =
+  createColumnHelper<SerializeFrom<typeof loader>["transactions"][0]>();
+const columns = [
+  columnHelper.accessor("id", { header: "ID" }),
+  columnHelper.accessor("createdAt", {
+    header: "Date",
+    cell: (info) => info.getValue().toString(),
+  }),
+  columnHelper.accessor("reference", { header: () => "Reference" }),
+  columnHelper.accessor("amount", {
+    header: () => "Amount",
+    cell: (info) => formatMoney(info.getValue()),
+  }),
+];
+
 export default function Transactions() {
+  const navigate = useNavigate();
   const { total, take, page, transactions } = useLoaderData<typeof loader>();
   const pagesTotal = Math.ceil(total / take);
+
+  const table = useReactTable({
+    columns,
+    data: transactions,
+    getCoreRowModel: getCoreRowModel(),
+    manualSorting: true,
+    manualFiltering: true,
+
+    // server-side pagination
+    manualPagination: true,
+    rowCount: total,
+    state: {
+      pagination: {
+        pageIndex: page,
+        pageSize: take,
+      },
+    },
+  });
 
   return (
     <div className="w-full">
@@ -41,20 +86,50 @@ export default function Transactions() {
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Reference</TableHead>
-              <TableHead>Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transactions.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell>{transaction.createdAt}</TableCell>
-                <TableCell>{transaction.reference}</TableCell>
-                <TableCell>{formatMoney(transaction.amount)}</TableCell>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
@@ -92,9 +167,24 @@ export default function Transactions() {
             ))}
           </PaginationContent>
         </Pagination>
+        <div className="space-x-2">
+          <Link
+            to={`?page=${page - 1}`}
+            //  disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Link>
+          <Link
+            to={`?page=${page + 1}`}
+            // disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Link>
+        </div>
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
           <span className="hidden md:inline">
-            Showing {transactions.length} of {total} entries
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
           </span>
           <span className="md:hidden">1-20 of 53</span>
         </div>
@@ -103,13 +193,11 @@ export default function Transactions() {
   );
 }
 
-export const handle = { path: () => "/transactions" };
-
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await requireUser(request);
   const url = new URL(request.url);
   const take = Number(url.searchParams.get("take")) || 10;
-  const page = Number(url.searchParams.get("page")) || 1;
+  const page = Number(url.searchParams.get("page")) || 0;
 
   const [total, transactions] = await Promise.all([
     prisma.transaction.count({
@@ -118,36 +206,22 @@ export async function loader({ request }: LoaderFunctionArgs) {
     prisma.transaction.findMany({
       where: { userId: user.id },
       take,
-      skip: (page - 1) * take,
+      skip: page * take,
+      select: {
+        id: true,
+        createdAt: true,
+        reference: true,
+        amount: true,
+      },
     }),
   ]);
 
-  return {
+  return json({
     take,
     page,
     total,
     transactions,
-  };
+  });
 }
 
-// <Button className="hidden sm:flex" variant="outline">
-//   Today
-// </Button>
-// <Button className="hidden md:flex" variant="outline">
-//   This Month
-// </Button>
-// <Popover>
-//   <PopoverTrigger asChild>
-//     <Button
-//       className="w-[280px] justify-start text-left font-normal"
-//       id="date"
-//       variant="outline"
-//     >
-//       <CalendarClockIcon className="mr-2 h-4 w-4" />
-//       June 01, 2023 - June 30, 2023
-//     </Button>
-//   </PopoverTrigger>
-//   <PopoverContent align="end" className="w-auto p-0">
-//     {/* <Calendar initialFocus mode="range" numberOfMonths={2} /> */}
-//   </PopoverContent>
-// </Popover>
+export const handle = { path: () => "/transactions" };
