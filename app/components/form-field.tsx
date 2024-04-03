@@ -1,17 +1,19 @@
 import type { FieldMetadata } from "@conform-to/react";
 import type { ComponentProps } from "react";
+import { cn } from "~/utils";
+import { RequiredAsterisk } from "./required-asterisk";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { RequiredAsterisk } from "./required-asterisk";
 
 export function FormField({
   field,
   label,
+  className,
   hideRequiredAsterisk = false,
   ...props
 }: FormFieldProps) {
   return (
-    <div className="flex flex-col space-y-1.5">
+    <div className={cn("flex flex-col space-y-1.5", className)}>
       <Label htmlFor={field.id}>
         {label}
         {!hideRequiredAsterisk && props.required ? <RequiredAsterisk /> : null}

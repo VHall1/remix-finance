@@ -43,12 +43,14 @@ export default function SignUp() {
                 field={fields.firstName}
                 label="First name"
                 placeholder="John"
+                className="flex-1"
                 required
               />
               <FormField
                 field={fields.lastName}
                 label="Last name"
                 placeholder="Doe"
+                className="flex-1"
                 required
               />
             </div>
@@ -67,7 +69,7 @@ export default function SignUp() {
               required
             />
 
-            <Button>Sign up</Button>
+            <Button size="lg">Sign up</Button>
             <div className="text-destructive text-center">{form.errors}</div>
           </div>
         </Form>

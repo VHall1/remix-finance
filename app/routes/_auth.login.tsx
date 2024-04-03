@@ -38,7 +38,7 @@ export default function Login() {
               required
             />
 
-            <Button>Log in</Button>
+            <Button size="lg">Log in</Button>
             <div className="text-destructive text-center">{form.errors}</div>
           </div>
         </Form>
