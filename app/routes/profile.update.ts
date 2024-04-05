@@ -1,4 +1,5 @@
 import { parseWithZod } from "@conform-to/zod";
+import { $Enums } from "@prisma/client";
 import { json, redirect, type ActionFunction } from "@remix-run/node";
 import { z } from "zod";
 import { handle as logoutHandle } from "~/routes/logout";
@@ -8,6 +9,7 @@ import { prisma } from "~/services/prisma.server";
 export const schema = z.object({
   firstName: z.string(),
   lastName: z.string(),
+  defaultCurrency: z.nativeEnum($Enums.Currency),
   avatar: z.string().url().optional(),
 });
 
@@ -33,6 +35,7 @@ export const action: ActionFunction = async ({ request }) => {
       data: {
         firstName: submission.value.firstName,
         lastName: submission.value.lastName,
+        defaultCurrency: submission.value.defaultCurrency,
         avatar: submission.value.avatar,
       },
     }),

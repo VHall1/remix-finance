@@ -4,9 +4,18 @@ import { useActionData, useFetcher, useLoaderData } from "@remix-run/react";
 import { User } from "lucide-react";
 import { useMemo } from "react";
 import { FormField } from "~/components/form-field";
+import { RequiredAsterisk } from "~/components/required-asterisk";
 import { Avatar, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { Label } from "~/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import {
   action,
   schema,
@@ -17,7 +26,8 @@ import { loader } from "../route";
 
 export function ProfileSection() {
   const fetcher = useFetcher();
-  const { user, joined } = useLoaderData<typeof loader>();
+  const { user, joined, defaultCurrency, currencyOptions } =
+    useLoaderData<typeof loader>();
   const lastResult = useActionData<typeof action>();
   const [form, fields] = useForm({
     lastResult,
@@ -29,12 +39,11 @@ export function ProfileSection() {
       firstName: user.firstName,
       lastName: user.lastName,
       avatar: user.avatar,
+      defaultCurrency,
     },
   });
   const joinedDate = useMemo(() => {
-    if (!joined) return null;
-
-    const date = new Date(joined.createdAt);
+    const date = new Date(joined);
     const day = date.getDate();
     const month = date.toLocaleString("default", {
       month: "long",
@@ -89,6 +98,37 @@ export function ProfileSection() {
                   required
                   {...getInputProps(fields.lastName, { type: "text" })}
                 />
+              </div>
+
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor={fields.defaultCurrency.id}>
+                  Default currency
+                  <RequiredAsterisk />
+                </Label>
+                <Select
+                  id={fields.defaultCurrency.id}
+                  name={fields.defaultCurrency.name}
+                  defaultValue={defaultCurrency}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={currencyOptions.CAD}>
+                      {currencyOptions.CAD}
+                    </SelectItem>
+                    <SelectItem value={currencyOptions.EUR}>
+                      {currencyOptions.EUR}
+                    </SelectItem>
+                    <SelectItem value={currencyOptions.GBP}>
+                      {currencyOptions.GBP}
+                    </SelectItem>
+                    <SelectItem value={currencyOptions.USD}>
+                      {currencyOptions.USD}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <FormField

@@ -1,10 +1,6 @@
+import { parseWithZod } from "@conform-to/zod";
 import { LoaderFunctionArgs, SerializeFrom, json } from "@remix-run/node";
-import {
-  Link,
-  useLoaderData,
-  useLocation,
-  useNavigate,
-} from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import {
   createColumnHelper,
   flexRender,
@@ -12,6 +8,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ChevronDownIcon } from "lucide-react";
+import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -168,18 +165,18 @@ export default function Transactions() {
           </PaginationContent>
         </Pagination>
         <div className="space-x-2">
-          <Link
-            to={`?page=${page - 1}`}
-            //  disabled={!table.getCanPreviousPage()}
+          <Button
+            onClick={() => navigate(`?page=${page - 1}`)}
+            disabled={!table.getCanPreviousPage()}
           >
             Previous
-          </Link>
-          <Link
-            to={`?page=${page + 1}`}
-            // disabled={!table.getCanNextPage()}
+          </Button>
+          <Button
+            onClick={() => navigate(`?page=${page + 1}`)}
+            disabled={!table.getCanNextPage()}
           >
             Next
-          </Link>
+          </Button>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
           <span className="hidden md:inline">
@@ -193,11 +190,23 @@ export default function Transactions() {
   );
 }
 
+const schema = z.object({
+  take: z.number().int().positive().catch(10),
+  page: z.number().int().nonnegative().catch(0),
+});
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await requireUser(request);
   const url = new URL(request.url);
-  const take = Number(url.searchParams.get("take")) || 10;
-  const page = Number(url.searchParams.get("page")) || 0;
+
+  const submission = parseWithZod(url.searchParams, { schema });
+
+  let page = 0;
+  let take = 10;
+  if (submission.status === "success") {
+    page = submission.value.page;
+    take = submission.value.take;
+  }
 
   const [total, transactions] = await Promise.all([
     prisma.transaction.count({

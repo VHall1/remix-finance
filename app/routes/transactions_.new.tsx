@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { handle as logoutHandle } from "~/routes/logout";
 import { requireUser } from "~/services/auth.server";
 import { prisma } from "~/services/prisma.server";
 import { handle as showTransactionHandle } from "./transactions.$transactionId";
@@ -96,11 +97,17 @@ export async function action({ request }: ActionFunctionArgs) {
     return json(submission.reply());
   }
 
+  const fullUser = await prisma.user.findUnique({ where: { id: user.id } });
+  if (!fullUser) {
+    throw redirect(logoutHandle.path());
+  }
+
   const transaction = await prisma.transaction.create({
     data: {
       amount: submission.value.amount,
       direction: submission.value.direction,
       reference: submission.value.reference,
+      currency: fullUser.defaultCurrency,
       userId: user.id,
     },
   });

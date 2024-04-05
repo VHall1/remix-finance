@@ -1,5 +1,5 @@
 import type { FieldMetadata } from "@conform-to/react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { cn } from "~/utils";
 import { RequiredAsterisk } from "./required-asterisk";
 import { Input } from "./ui/input";
@@ -26,6 +26,6 @@ export function FormField({
 
 type FormFieldProps = ComponentProps<typeof Input> & {
   field: FieldMetadata;
-  label: string;
+  label: ReactNode;
   hideRequiredAsterisk?: boolean;
 };
