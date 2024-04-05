@@ -18,8 +18,6 @@ export function Navbar() {
   const user = useOptionalUser();
   const fetcher = useFetcher();
 
-  // const fallbackAvatar = [user?.firstName[0], user?.lastName[0]];
-
   const logout = () => {
     fetcher.submit({}, { action: logoutHandle.path(), method: "post" });
   };
