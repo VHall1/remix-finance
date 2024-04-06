@@ -138,7 +138,11 @@ export function ProfileSection() {
                   Cancel
                 </Button>
               </div>
-              <div className="text-destructive text-center">{form.errors}</div>
+              {form.errors ? (
+                <div className="text-destructive text-center">
+                  {form.errors}
+                </div>
+              ) : null}
             </div>
           </CardContent>
         </fetcher.Form>
