@@ -1,4 +1,4 @@
-import { useForm } from "@conform-to/react";
+import { getInputProps, useForm } from "@conform-to/react";
 import { $Enums } from "@prisma/client";
 import { Form } from "@remix-run/react";
 import { output } from "zod";
@@ -21,8 +21,17 @@ export function TransactionsForm({
   return (
     <Form method="post" id={form.id} onSubmit={form.onSubmit}>
       <div>
-        <FormField field={fields.amount} label="Amount" required />
-        <FormField field={fields.reference} label="Reference" />
+        <FormField
+          field={fields.amount}
+          label="Amount"
+          required
+          {...getInputProps(fields.amount, { type: "text" })}
+        />
+        <FormField
+          field={fields.reference}
+          label="Reference"
+          {...getInputProps(fields.reference, { type: "text" })}
+        />
 
         <div className="flex flex-col space-y-1.5">
           <Label htmlFor={fields.direction.id}>Transaction Type</Label>
