@@ -106,12 +106,11 @@ export function ProfileSection() {
                   <RequiredAsterisk />
                 </Label>
                 <Select
-                  id={fields.defaultCurrency.id}
                   name={fields.defaultCurrency.name}
                   defaultValue={defaultCurrency}
                   required
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id={fields.defaultCurrency.id}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
