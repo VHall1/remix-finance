@@ -1,4 +1,4 @@
-import { getFormProps, getInputProps, useForm } from "@conform-to/react";
+import { getInputProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { useActionData, useFetcher } from "@remix-run/react";
 import { Lock } from "lucide-react";
@@ -31,9 +31,9 @@ export function ChangePasswordSection() {
           <h2 className="text-lg font-semibold">Change password</h2>
         </CustomCardHeader>
         <fetcher.Form
-          method="post"
+          method="put"
           action={changePasswordHandle.path()}
-          {...getFormProps(form)}
+          id={form.id}
         >
           <CardContent className="py-6">
             <div className="grid gap-4">

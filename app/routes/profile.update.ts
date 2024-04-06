@@ -1,8 +1,7 @@
 import { parseWithZod } from "@conform-to/zod";
 import { $Enums } from "@prisma/client";
-import { json, redirect, type ActionFunction } from "@remix-run/node";
+import { ActionFunctionArgs, json } from "@remix-run/node";
 import { z } from "zod";
-import { handle as logoutHandle } from "~/routes/logout";
 import { getUserSession, requireUser } from "~/services/auth.server";
 import { prisma } from "~/services/prisma.server";
 
@@ -13,19 +12,14 @@ export const schema = z.object({
   avatar: z.string().url().optional(),
 });
 
-export const action: ActionFunction = async ({ request }) => {
+export async function action({ request }: ActionFunctionArgs) {
   const user = await requireUser(request);
+
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema });
 
   if (submission.status !== "success") {
     return json(submission.reply());
-  }
-
-  const fullUser = await prisma.user.findUnique({ where: { id: user.id } });
-  // shouldn't happen since we're requiring the user above, but still good to check
-  if (!fullUser) {
-    throw redirect(logoutHandle.path());
   }
 
   const [session, updatedUser] = await Promise.all([
@@ -52,7 +46,7 @@ export const action: ActionFunction = async ({ request }) => {
   return json(submission.reply(), {
     headers: { "Set-Cookie": await session.commit() },
   });
-};
+}
 
 export const handle = {
   path: () => "/profile/update",

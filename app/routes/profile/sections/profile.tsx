@@ -1,6 +1,6 @@
-import { getFormProps, getInputProps, useForm } from "@conform-to/react";
+import { getInputProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import { useActionData, useFetcher, useLoaderData } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { User } from "lucide-react";
 import { useMemo } from "react";
 import { FormField } from "~/components/form-field";
@@ -25,10 +25,10 @@ import { CustomCardHeader } from "../custom-card-header";
 import { loader } from "../route";
 
 export function ProfileSection() {
-  const fetcher = useFetcher();
+  const fetcher = useFetcher<typeof action>();
+  const lastResult = fetcher.data;
   const { user, joined, defaultCurrency, currencyOptions } =
     useLoaderData<typeof loader>();
-  const lastResult = useActionData<typeof action>();
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
@@ -76,11 +76,7 @@ export function ProfileSection() {
             ) : null}
           </div>
         </CardHeader>
-        <fetcher.Form
-          method="post"
-          action={updateHandle.path()}
-          {...getFormProps(form)}
-        >
+        <fetcher.Form method="put" action={updateHandle.path()} id={form.id}>
           <CardContent>
             <div className="grid gap-4">
               <div className="flex gap-4">
