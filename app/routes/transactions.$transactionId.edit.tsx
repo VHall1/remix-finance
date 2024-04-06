@@ -1,7 +1,12 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
-import { useActionData } from "@remix-run/react";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  json,
+  redirect,
+} from "@remix-run/node";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import { handle as logoutHandle } from "~/routes/logout";
 import { TransactionsForm } from "~/routes/transactions/form";
 import { TransactionsHeader } from "~/routes/transactions/header";
@@ -11,7 +16,8 @@ import { prisma } from "~/services/prisma.server";
 import { handle as showTransactionHandle } from "./transactions.$transactionId._show";
 import { handle as indexTransactionHandle } from "./transactions._index";
 
-export default function NewTransaction() {
+export default function EditTransaction() {
+  const { transaction } = useLoaderData<typeof loader>();
   const lastResult = useActionData<typeof action>();
   const useFormHookResult = useForm({
     lastResult,
@@ -19,6 +25,11 @@ export default function NewTransaction() {
       return parseWithZod(formData, { schema: transactionSchema });
     },
     shouldValidate: "onBlur",
+    defaultValue: {
+      amount: transaction.amount,
+      direction: transaction.direction,
+      reference: transaction.reference,
+    },
   });
 
   return (
@@ -30,14 +41,26 @@ export default function NewTransaction() {
 }
 
 export const handle = {
-  path: () => "/transactions/new",
+  path: (transactionId: number) => `/transactions/${transactionId}/edit`,
   header: () => (
     <TransactionsHeader
       path={indexTransactionHandle.path()}
-      title="New transaction"
+      title="Edit transaction"
     />
   ),
 };
+
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const user = await requireUser(request);
+  const transaction = await prisma.transaction.findUnique({
+    where: { id: Number(params.transactionId), userId: user.id },
+  });
+  if (!transaction) {
+    throw new Response("Transaction not found", { status: 404 });
+  }
+
+  return { transaction };
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   const user = await requireUser(request);

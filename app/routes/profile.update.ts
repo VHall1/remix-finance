@@ -42,6 +42,10 @@ export async function action({ request }: ActionFunctionArgs) {
     lastName: updatedUser.lastName,
     avatar: updatedUser.avatar,
   });
+  session.getSession().flash("flash", {
+    title: "Profile updated!",
+    description: "test",
+  });
 
   return json(submission.reply(), {
     headers: { "Set-Cookie": await session.commit() },

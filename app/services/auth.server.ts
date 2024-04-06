@@ -14,10 +14,11 @@ export async function getUserSession(request: Request) {
   );
 
   return {
-    getUser: (): AuthUser | undefined => session.get("user"),
+    getUser: () => session.get("user"),
     setUser: (user: AuthUser) => session.set("user", user),
     logout: () => session.unset("user"),
     commit: () => sessionStorage.commitSession(session),
+    getSession: () => session,
   };
 }
 

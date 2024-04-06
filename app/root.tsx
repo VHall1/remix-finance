@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaFunction, json } from "@remix-run/node";
 import {
   Links,
   Meta,
@@ -8,8 +8,9 @@ import {
   isRouteErrorResponse,
   useRouteError,
 } from "@remix-run/react";
+import { Toaster } from "~/components/ui/toaster";
+import { getUserSession } from "~/services/auth.server";
 import "./globals.css";
-import { getUserSession } from "./services/auth.server";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,6 +23,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="dark">
         {children}
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -33,14 +35,16 @@ export default function App() {
   return <Outlet />;
 }
 
-export const handle = {
-  id: "root",
-  path: () => "/",
-};
-
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { getUser } = await getUserSession(request);
-  return getUser() || null;
+  const { getUser, getSession, commit } = await getUserSession(request);
+  return json(
+    {
+      user: getUser() || null,
+      flash: getSession().get("flash"),
+    },
+    // Clear flash after reading
+    { headers: { "Set-Cookie": await commit() } }
+  );
 }
 
 export const meta: MetaFunction = () => {
