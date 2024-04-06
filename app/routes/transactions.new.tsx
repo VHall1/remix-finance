@@ -4,12 +4,12 @@ import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import { handle as logoutHandle } from "~/routes/logout";
 import { TransactionsForm } from "~/routes/transactions/form";
+import { TransactionsHeader } from "~/routes/transactions/header";
 import { transactionSchema } from "~/schemas/transaction";
 import { requireUser } from "~/services/auth.server";
 import { prisma } from "~/services/prisma.server";
 import { handle as showTransactionHandle } from "./transactions.$transactionId";
 import { handle as indexTransactionHandle } from "./transactions._index";
-import { TransactionsHeader } from "./transactions/header";
 
 export default function NewTransaction() {
   const lastResult = useActionData<typeof action>();
@@ -22,20 +22,22 @@ export default function NewTransaction() {
   });
 
   return (
-    <>
-      <TransactionsHeader
-        path={indexTransactionHandle.path()}
-        title="New transaction"
-      />
-      <TransactionsForm
-        useFormHookResult={useFormHookResult}
-        submitText="Submit transaction"
-      />
-    </>
+    <TransactionsForm
+      useFormHookResult={useFormHookResult}
+      submitText="Submit transaction"
+    />
   );
 }
 
-export const handle = { path: () => "/transactions/new" };
+export const handle = {
+  path: () => "/transactions/new",
+  header: () => (
+    <TransactionsHeader
+      path={indexTransactionHandle.path()}
+      title="New transaction"
+    />
+  ),
+};
 
 export async function action({ request }: ActionFunctionArgs) {
   const user = await requireUser(request);
