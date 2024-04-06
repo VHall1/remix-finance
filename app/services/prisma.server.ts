@@ -1,9 +1,10 @@
 import { PrismaClient } from "@prisma/client";
+import { userModel } from "~/models/user.server";
 import { singleton } from "~/utils/singleton.server";
 
 const prisma = singleton("prisma", getClient);
 
-function getClient(): PrismaClient {
+function getClient() {
   // NOTE: during development if you change anything in this function, remember
   // that this only runs once per server restart and won't automatically be
   // re-run per request like everything else is.
@@ -14,7 +15,7 @@ function getClient(): PrismaClient {
       { level: "info", emit: "stdout" },
       { level: "warn", emit: "stdout" },
     ],
-  });
+  }).$extends(userModel);
 
   // make the connection eagerly so the first request doesn't have to wait
   void client.$connect();

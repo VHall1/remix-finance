@@ -33,12 +33,12 @@ export function Navbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                className="rounded-full border border-gray-200 w-10 h-10 dark:border-gray-800"
+                className="rounded-full border border-gray-200 w-8 h-8 dark:border-gray-800"
                 id="menu"
                 size="icon"
                 variant="ghost"
               >
-                <Avatar className="w-10 h-10">
+                <Avatar className="w-8 h-8">
                   <AvatarImage src={user.avatar ?? ""} />
                   <AvatarFallback>
                     {user.firstName[0]}

@@ -3,12 +3,12 @@ import { parseWithZod } from "@conform-to/zod";
 import { Prisma, User } from "@prisma/client";
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
-import { z } from "zod";
 import { FormField } from "~/components/form-field";
 import { Button } from "~/components/ui/button";
 import { CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
-import { getUserSession, hashPassword } from "~/services/auth.server";
+import { signUpSchema } from "~/schemas/user";
+import { getUserSession } from "~/services/auth.server";
 import { prisma } from "~/services/prisma.server";
 import { AuthCard } from "./_auth/auth-card";
 
@@ -17,7 +17,7 @@ export default function SignUp() {
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema });
+      return parseWithZod(formData, { schema: signUpSchema });
     },
     shouldValidate: "onBlur",
   });
@@ -29,7 +29,7 @@ export default function SignUp() {
       </CardHeader>
       <CardContent>
         <Form method="post" id={form.id} onSubmit={form.onSubmit}>
-          <div className="grid w-full items-center gap-4">
+          <div className="grid gap-4 w-full items-center">
             <FormField
               field={fields.email}
               label="Email"
@@ -62,13 +62,6 @@ export default function SignUp() {
               required
             />
 
-            <FormField
-              field={fields.password2}
-              label="Confirm password"
-              type="password"
-              required
-            />
-
             <Button size="lg">Sign up</Button>
             <div className="text-destructive text-center">{form.errors}</div>
           </div>
@@ -87,39 +80,21 @@ export default function SignUp() {
   );
 }
 
-const schema = z.object({
-  email: z.string().email(),
-  firstName: z.string(),
-  lastName: z.string(),
-  password: z.string().min(8, "Password must be at least 8 characters long"),
-  password2: z.string(),
-});
-
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema });
+  const submission = parseWithZod(formData, { schema: signUpSchema });
 
   if (submission.status !== "success") {
     return json(submission.reply());
   }
 
-  if (submission.value.password !== submission.value.password2) {
-    return json(
-      submission.reply({
-        formErrors: ["Passwords do not match"],
-      })
-    );
-  }
-
   let user: User;
   try {
-    user = await prisma.user.create({
-      data: {
-        firstName: submission.value.firstName,
-        lastName: submission.value.lastName,
-        email: submission.value.email,
-        passwordHash: await hashPassword(submission.value.password),
-      },
+    user = await prisma.user.signUp({
+      email: submission.value.email,
+      firstName: submission.value.firstName,
+      lastName: submission.value.lastName,
+      password: submission.value.lastName,
     });
   } catch (error) {
     if (
@@ -144,7 +119,7 @@ export async function action({ request }: ActionFunctionArgs) {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    avatar: null,
+    avatar: user.avatar,
   });
 
   return redirect("/", {

@@ -2,18 +2,24 @@ import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
-import { z } from "zod";
 import { FormField } from "~/components/form-field";
 import { Button } from "~/components/ui/button";
 import { CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
-import { comparePassword, getUserSession } from "~/services/auth.server";
+import { loginSchema } from "~/schemas/user";
+import { getUserSession } from "~/services/auth.server";
 import { prisma } from "~/services/prisma.server";
 import { AuthCard } from "./_auth/auth-card";
 
 export default function Login() {
   const lastResult = useActionData<typeof action>();
-  const [form, fields] = useForm({ lastResult });
+  const [form, fields] = useForm({
+    lastResult,
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema: loginSchema });
+    },
+    shouldValidate: "onBlur",
+  });
 
   return (
     <AuthCard>
@@ -22,7 +28,7 @@ export default function Login() {
       </CardHeader>
       <CardContent>
         <Form method="post" id={form.id} onSubmit={form.onSubmit}>
-          <div className="grid w-full items-center gap-4">
+          <div className="grid gap-4 w-full items-center">
             <FormField
               field={fields.email}
               label="Email"
@@ -56,28 +62,20 @@ export default function Login() {
   );
 }
 
-const schema = z.object({
-  email: z.string().email(),
-  password: z.string(),
-});
-
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema });
+  const submission = parseWithZod(formData, { schema: loginSchema });
 
   if (submission.status !== "success") {
     return json(submission.reply());
   }
 
-  const session = await getUserSession(request);
-  const user = await prisma.user.findUnique({
-    where: { email: submission.value.email },
+  const user = await prisma.user.login({
+    email: submission.value.email,
+    password: submission.value.password,
   });
 
-  if (
-    !user ||
-    !(await comparePassword(submission.value.password, user.passwordHash))
-  ) {
+  if (!user) {
     return json(
       submission.reply({
         formErrors: ["Email or password invalid"],
@@ -85,6 +83,7 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
+  const session = await getUserSession(request);
   session.setUser({
     id: user.id,
     firstName: user.firstName,
