@@ -15,7 +15,8 @@ export async function getUserSession(request: Request) {
 
   return {
     getUser: (): AuthUser | undefined => session.get("user"),
-    setUser: (user: AuthUser | undefined) => session.set("user", user),
+    setUser: (user: AuthUser) => session.set("user", user),
+    logout: () => session.unset("user"),
     commit: () => sessionStorage.commitSession(session),
   };
 }
@@ -24,13 +25,12 @@ export async function requireUser(request: Request): Promise<AuthUser> {
   const session = await getUserSession(request);
   const user = session.getUser();
 
+  // TODO: Add flash message if when they get logged out
   if (!user) {
-    // const session = await getSession(request);
-    // await session.signOut();
-    throw redirect(
-      "/login"
-      // { headers: await session.getHeaders() }
-    );
+    session.logout();
+    throw redirect("/login", {
+      headers: { "Set-Cookie": await session.commit() },
+    });
   }
 
   return user;

@@ -6,7 +6,7 @@ export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
   const session = await getUserSession(request);
-  session.setUser(undefined);
+  session.logout();
   return json(
     {},
     {
