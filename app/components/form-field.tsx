@@ -24,7 +24,7 @@ export function FormField({
   );
 }
 
-type FormFieldProps = ComponentProps<typeof Input> & {
+type FormFieldProps = Omit<ComponentProps<typeof Input>, "id" | "name"> & {
   field: FieldMetadata;
   label: ReactNode;
   hideRequiredAsterisk?: boolean;

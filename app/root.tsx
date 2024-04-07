@@ -41,6 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     {
       user: getUser() || null,
       flash: getSession().get("flash"),
+      toast: getSession().get("toast"),
     },
     // Clear flash after reading
     { headers: { "Set-Cookie": await commit() } }

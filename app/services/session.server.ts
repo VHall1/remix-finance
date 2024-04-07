@@ -17,6 +17,12 @@ type SessionFlashData = {
   flash: {
     title?: string;
     description?: string;
+    error?: boolean;
+  };
+  toast: {
+    title?: string;
+    description?: string;
+    error?: boolean;
   };
 };
 

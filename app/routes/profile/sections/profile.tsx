@@ -1,4 +1,4 @@
-import { getInputProps, useForm } from "@conform-to/react";
+import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { User } from "lucide-react";
@@ -27,6 +27,7 @@ import { loader } from "../route";
 export function ProfileSection() {
   const fetcher = useFetcher<typeof action>();
   const lastResult = fetcher.data;
+  // const isSubmitting = fetcher.state !== "idle";
   const { user, joined, defaultCurrency, currencyOptions } =
     useLoaderData<typeof loader>();
   const [form, fields] = useForm({
@@ -35,6 +36,7 @@ export function ProfileSection() {
       return parseWithZod(formData, { schema });
     },
     shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
     defaultValue: {
       firstName: user.firstName,
       lastName: user.lastName,
@@ -67,32 +69,37 @@ export function ProfileSection() {
             </Avatar>
           ) : null}
 
-          <div className="space-y-1 text-center">
+          <div className="flex flex-col space-y-1 text-center">
             <h1 className="text-2xl font-bold">{user.firstName}</h1>
             {joinedDate ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 Joined on {joinedDate}
               </p>
             ) : null}
           </div>
         </CardHeader>
-        <fetcher.Form method="put" action={updateHandle.path()} id={form.id}>
+        <fetcher.Form
+          method="POST"
+          action={updateHandle.path()}
+          id={form.id}
+          onSubmit={form.onSubmit}
+        >
           <CardContent>
             <div className="grid gap-4">
               <div className="flex gap-4">
                 <FormField
                   field={fields.firstName}
+                  defaultValue={fields.firstName.initialValue}
                   label="First name"
                   className="flex-1"
                   required
-                  {...getInputProps(fields.firstName, { type: "text" })}
                 />
                 <FormField
                   field={fields.lastName}
+                  defaultValue={fields.lastName.initialValue}
                   label="Last name"
                   className="flex-1"
                   required
-                  {...getInputProps(fields.lastName, { type: "text" })}
                 />
               </div>
 
@@ -103,8 +110,7 @@ export function ProfileSection() {
                 </Label>
                 <Select
                   name={fields.defaultCurrency.name}
-                  defaultValue={defaultCurrency}
-                  required
+                  defaultValue={fields.defaultCurrency.initialValue}
                 >
                   <SelectTrigger id={fields.defaultCurrency.id}>
                     <SelectValue />
@@ -128,16 +134,17 @@ export function ProfileSection() {
 
               <FormField
                 field={fields.avatar}
+                defaultValue={fields.avatar.initialValue}
                 label="Avatar"
-                {...getInputProps(fields.avatar, { type: "url" })}
               />
 
-              <div className="flex gap-4">
-                <Button>Save</Button>
-                <Button onClick={() => form.reset()} variant="outline">
+              <div className="flex gap-2">
+                <Button type="submit">Save</Button>
+                <Button variant="outline" type="reset">
                   Cancel
                 </Button>
               </div>
+
               {form.errors ? (
                 <div className="text-destructive text-center">
                   {form.errors}

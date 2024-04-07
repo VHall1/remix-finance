@@ -1,13 +1,25 @@
 import { Link } from "@remix-run/react";
 import { BarChartHorizontal, Terminal } from "lucide-react";
-import type { PropsWithChildren } from "react";
+import { useEffect, type PropsWithChildren } from "react";
 import { Navbar } from "~/components/navbar";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { useRootData } from "~/hooks/useRootData";
 import { handle as transactionsHandle } from "~/routes/transactions._index";
+import { useToast } from "./ui/use-toast";
 
 export function Shell({ children }: PropsWithChildren) {
-  const { flash } = useRootData();
+  const { flash, toast } = useRootData();
+  const { toast: spawnToast } = useToast();
+
+  useEffect(() => {
+    if (!toast) return;
+
+    spawnToast({
+      title: toast.title,
+      description: toast.description,
+      variant: toast.error ? "destructive" : "default",
+    });
+  }, [spawnToast, toast]);
 
   return (
     <div className="grid h-screen [grid-template-columns:minmax(max-content,12.8125rem)_1fr] [grid-template-rows:max-content_max-content_1fr] [grid-template-areas:'logo_header''aside_flash''aside_main']">
@@ -32,7 +44,7 @@ export function Shell({ children }: PropsWithChildren) {
       </nav>
       {flash ? (
         <div className="pt-6 container [grid-area:flash]">
-          <Alert>
+          <Alert variant={flash.error ? "destructive" : "default"}>
             <Terminal className="h-4 w-4" />
             <AlertTitle>{flash.title}</AlertTitle>
             <AlertDescription>{flash.description}</AlertDescription>

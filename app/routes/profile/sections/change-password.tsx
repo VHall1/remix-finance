@@ -1,6 +1,6 @@
-import { getInputProps, useForm } from "@conform-to/react";
+import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import { useActionData, useFetcher } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { Lock } from "lucide-react";
 import { FormField } from "~/components/form-field";
 import { Button } from "~/components/ui/button";
@@ -13,14 +13,20 @@ import {
 import { CustomCardHeader } from "../custom-card-header";
 
 export function ChangePasswordSection() {
-  const fetcher = useFetcher();
-  const lastResult = useActionData<typeof action>();
+  const fetcher = useFetcher<typeof action>();
+  const lastResult = fetcher.data;
+  // const isSubmitting = fetcher.state !== "idle";
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema });
     },
     shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
+    defaultValue: {
+      currentPassword: "",
+      password: "",
+    },
   });
 
   return (
@@ -31,32 +37,31 @@ export function ChangePasswordSection() {
           <h2 className="text-lg font-semibold">Change password</h2>
         </CustomCardHeader>
         <fetcher.Form
-          method="put"
+          method="POST"
           action={changePasswordHandle.path()}
           id={form.id}
+          onSubmit={form.onSubmit}
         >
           <CardContent className="py-6">
             <div className="grid gap-4">
               <FormField
                 field={fields.currentPassword}
+                defaultValue={fields.currentPassword.initialValue}
                 label="Current password"
-                required
-                {...getInputProps(fields.currentPassword, { type: "password" })}
+                type="password"
               />
 
               <FormField
-                field={fields.currentPassword}
+                field={fields.password}
+                defaultValue={fields.password.initialValue}
                 label="New password"
-                required
-                {...getInputProps(fields.password, { type: "password" })}
+                type="password"
               />
 
-              <div className="flex gap-4">
-                <Button>Change password</Button>
-                <Button onClick={() => form.reset()} variant="outline">
-                  Cancel
-                </Button>
+              <div className="flex">
+                <Button type="submit">Change password</Button>
               </div>
+
               {form.errors ? (
                 <div className="text-destructive text-center">
                   {form.errors}

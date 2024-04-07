@@ -13,8 +13,6 @@ export const schema = z.object({
 });
 
 export async function action({ request }: ActionFunctionArgs) {
-  const user = await requireUser(request);
-
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema });
 
@@ -22,6 +20,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return json(submission.reply());
   }
 
+  const user = await requireUser(request);
   const [session, updatedUser] = await Promise.all([
     getUserSession(request),
     prisma.user.update({
@@ -42,10 +41,7 @@ export async function action({ request }: ActionFunctionArgs) {
     lastName: updatedUser.lastName,
     avatar: updatedUser.avatar,
   });
-  session.getSession().flash("flash", {
-    title: "Profile updated!",
-    description: "test",
-  });
+  session.getSession().flash("toast", { title: "Profile updated." });
 
   return json(submission.reply(), {
     headers: { "Set-Cookie": await session.commit() },
