@@ -1,25 +1,13 @@
 import { Link } from "@remix-run/react";
 import { BarChartHorizontal, Terminal } from "lucide-react";
-import { useEffect, type PropsWithChildren } from "react";
+import { type PropsWithChildren } from "react";
 import { Navbar } from "~/components/navbar";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { useRootData } from "~/hooks/useRootData";
 import { handle as transactionsHandle } from "~/routes/transactions._index";
-import { useToast } from "./ui/use-toast";
 
 export function Shell({ children }: PropsWithChildren) {
-  const { flash, toast } = useRootData();
-  const { toast: spawnToast } = useToast();
-
-  useEffect(() => {
-    if (!toast) return;
-
-    spawnToast({
-      title: toast.title,
-      description: toast.description,
-      variant: toast.error ? "destructive" : "default",
-    });
-  }, [spawnToast, toast]);
+  const { flash } = useRootData();
 
   return (
     <div className="grid h-screen [grid-template-columns:minmax(max-content,12.8125rem)_1fr] [grid-template-rows:max-content_max-content_1fr] [grid-template-areas:'logo_header''aside_flash''aside_main']">

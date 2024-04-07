@@ -6,11 +6,14 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  useLoaderData,
   useRouteError,
 } from "@remix-run/react";
 import { Toaster } from "~/components/ui/toaster";
+import { useToast } from "~/components/ui/use-toast";
 import { getUserSession } from "~/services/auth.server";
 import "./globals.css";
+import { useEffect } from "react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -32,6 +35,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const { toast: spawnToast } = useToast();
+  const { toast } = useLoaderData<typeof loader>();
+
+  useEffect(() => {
+    if (!toast) return;
+
+    spawnToast({
+      title: toast.title,
+      description: toast.description,
+      variant: toast.error ? "destructive" : "default",
+    });
+  }, [spawnToast, toast]);
+
   return <Outlet />;
 }
 
