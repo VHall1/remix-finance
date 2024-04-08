@@ -1,7 +1,17 @@
 import { Link, useFetcher } from "@remix-run/react";
-import { LogOut, Package2Icon, User } from "lucide-react";
+import { LogOut, Menu, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "~/components/ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,11 +33,22 @@ export function Navbar() {
   };
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-6 [grid-area:header]">
-      <Link className="lg:hidden" to="/">
-        <Package2Icon className="h-6 w-6" />
-        <span className="sr-only">Home</span>
-      </Link>
+    <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-2 lg:px-6 [grid-area:header]">
+      <Drawer direction="left">
+        <DrawerTrigger>
+          <Button className="lg:hidden" variant="ghost" size="icon">
+            <Menu className="h-8 w-8" />
+            <span className="sr-only">Home</span>
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent
+          className="w-60 h-full bottom-0 left-0 rounded-none"
+          disableDragBar
+        >
+          Cock
+        </DrawerContent>
+      </Drawer>
+
       <div className="ml-auto flex items-center">
         {user ? (
           <DropdownMenu>

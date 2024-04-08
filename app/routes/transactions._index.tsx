@@ -7,7 +7,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
@@ -38,21 +38,6 @@ import { prisma } from "~/services/prisma.server";
 import { formatMoney } from "~/utils";
 import { TransactionsHeader } from "./transactions/header";
 
-const columnHelper =
-  createColumnHelper<SerializeFrom<typeof loader>["transactions"][0]>();
-const columns = [
-  columnHelper.accessor("id", { header: "ID" }),
-  columnHelper.accessor("createdAt", {
-    header: "Date",
-    cell: (info) => info.getValue().toString(),
-  }),
-  columnHelper.accessor("reference", { header: () => "Reference" }),
-  columnHelper.accessor("amount", {
-    header: () => "Amount",
-    cell: (info) => formatMoney(info.getValue()),
-  }),
-];
-
 export default function Transactions() {
   const navigate = useNavigate();
   const { total, take, page, transactions } = useLoaderData<typeof loader>();
@@ -75,129 +60,6 @@ export default function Transactions() {
       },
     },
   });
-
-  <>
-    <TransactionsHeader path="/" title="Transactions">
-      <div className="ml-auto flex items-center gap-2">
-        <Button asChild>
-          <Link to={newTransactionHandle.path()}>New transaction</Link>
-        </Button>
-      </div>
-    </TransactionsHeader>
-
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input placeholder="Filter transactions..." className="max-w-sm" />
-        <Button className="ml-auto">Download</Button>
-      </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-between w-full p-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              className="h-8 w-auto rounded-full px-3.5 flex-1 justify-between font-semibold text-left gap-1.5"
-              size="sm"
-              variant="outline"
-            >
-              20
-              <ChevronDownIcon className="w-4 h-4 shrink-0.5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-24 origin-top-left top-10">
-            <DropdownMenuRadioGroup defaultValue="20">
-              <DropdownMenuRadioItem value="10">10</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="20">20</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="50">50</DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Pagination>
-          <PaginationContent className="flex gap-1">
-            {[...new Array(pagesTotal)].map((_, idx) => (
-              <PaginationItem key={`pagination-page-${idx + 1}`}>
-                <PaginationLink
-                  to={`?page=${idx + 1}`}
-                  isActive={idx + 1 === page}
-                >
-                  {idx + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-          </PaginationContent>
-        </Pagination>
-        <div className="space-x-2">
-          <Button
-            onClick={() => navigate(`?page=${page - 1}`)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            onClick={() => navigate(`?page=${page + 1}`)}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-          <span className="hidden md:inline">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </span>
-          <span className="md:hidden">1-20 of 53</span>
-        </div>
-      </div>
-    </div>
-  </>;
 
   return (
     <div className="w-full">
@@ -276,20 +138,37 @@ export default function Transactions() {
           </DropdownMenuContent>
         </DropdownMenu>
         <Pagination>
-          <PaginationContent className="flex gap-1">
+          <PaginationContent className="gap-2">
+            <PaginationItem>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate(`?page=${page - 1}`)}
+                disabled={!table.getCanPreviousPage()}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+            </PaginationItem>
             {[...new Array(pagesTotal)].map((_, idx) => (
-              <PaginationItem key={`pagination-page-${idx + 1}`}>
-                <PaginationLink
-                  to={`?page=${idx + 1}`}
-                  isActive={idx + 1 === page}
-                >
+              <PaginationItem key={`pagination-page-${idx}`}>
+                <PaginationLink to={`?page=${idx}`} isActive={idx === page}>
                   {idx + 1}
                 </PaginationLink>
               </PaginationItem>
             ))}
+            <PaginationItem>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate(`?page=${page + 1}`)}
+                disabled={!table.getCanNextPage()}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </PaginationItem>
           </PaginationContent>
         </Pagination>
-        <div className="space-x-2">
+        {/* <div className="space-x-2">
           <Button
             onClick={() => navigate(`?page=${page - 1}`)}
             disabled={!table.getCanPreviousPage()}
@@ -302,7 +181,7 @@ export default function Transactions() {
           >
             Next
           </Button>
-        </div>
+        </div> */}
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
           <span className="hidden md:inline">
             {table.getFilteredSelectedRowModel().rows.length} of{" "}
@@ -314,6 +193,21 @@ export default function Transactions() {
     </div>
   );
 }
+
+const columnHelper =
+  createColumnHelper<SerializeFrom<typeof loader>["transactions"][0]>();
+const columns = [
+  columnHelper.accessor("id", { header: "ID" }),
+  columnHelper.accessor("createdAt", {
+    header: "Date",
+    cell: (info) => info.getValue().toString(),
+  }),
+  columnHelper.accessor("reference", { header: () => "Reference" }),
+  columnHelper.accessor("amount", {
+    header: () => "Amount",
+    cell: (info) => formatMoney(info.getValue()),
+  }),
+];
 
 const schema = z.object({
   take: z.number().int().positive().catch(10),
