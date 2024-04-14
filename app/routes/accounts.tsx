@@ -1,9 +1,5 @@
-import { Shell } from "~/components/shell";
+import { ShellWithOutlet } from "~/components/shell";
 
-export default function Accounts() {
-  return <Shell>Accounts</Shell>;
+export default function Transactions() {
+  return <ShellWithOutlet />;
 }
-
-export const handle = {
-  path: () => "/accounts",
-};
