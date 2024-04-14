@@ -1,17 +1,7 @@
 import { Link, useFetcher } from "@remix-run/react";
-import { LogOut, Menu, User } from "lucide-react";
+import { LogOut, MoonIcon, User } from "lucide-react";
+import { MobileAside } from "~/components/aside";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "~/components/ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,32 +23,14 @@ export function Navbar() {
   };
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-2 lg:px-6 [grid-area:header]">
-      <Drawer direction="left">
-        <DrawerTrigger>
-          <Button className="lg:hidden" variant="ghost" size="icon">
-            <Menu className="h-8 w-8" />
-            <span className="sr-only">Home</span>
-          </Button>
-        </DrawerTrigger>
-        <DrawerContent
-          className="w-60 h-full bottom-0 left-0 rounded-none"
-          disableDragBar
-        >
-          Cock
-        </DrawerContent>
-      </Drawer>
+    <header className="border-b bg-muted/40 [grid-area:header]">
+      <div className="container flex h-14 max-w-screen-2xl lg:max-w-full items-center">
+        <MobileAside />
 
-      <div className="ml-auto flex items-center">
-        {user ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                className="rounded-full"
-                id="menu"
-                size="icon"
-                variant="ghost"
-              >
+        <div className="ml-auto flex items-center">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="rounded-full">
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={user.avatar ?? ""} />
                   <AvatarFallback>
@@ -67,33 +39,37 @@ export function Navbar() {
                   </AvatarFallback>
                 </Avatar>
                 <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>
-                <div className="leading-6">
-                  {user.firstName} {user.lastName[0]}.
-                </div>
-                <div className="text-muted-foreground font-normal">
-                  {user.email}
-                </div>
-              </DropdownMenuLabel>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>
+                  <div className="leading-6">
+                    {user.firstName} {user.lastName[0]}.
+                  </div>
+                  <div className="text-muted-foreground font-normal">
+                    {user.email}
+                  </div>
+                </DropdownMenuLabel>
 
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link to={profileHandle.path()}>
-                  <User className="h-4 w-4 mr-3" />
-                  Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout}>
-                <LogOut className="h-4 w-4 mr-3" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : null}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to={profileHandle.path()}>
+                    <User className="h-4 w-4 mr-3" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <MoonIcon className="h-4 w-4 mr-3" />
+                  Colour scheme
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="h-4 w-4 mr-3" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
+        </div>
       </div>
     </header>
   );
