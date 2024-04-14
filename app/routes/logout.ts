@@ -1,5 +1,10 @@
-import type { ActionFunction, ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type {
+  ActionFunction,
+  ActionFunctionArgs,
+  LoaderFunction,
+} from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
+import { handle as loginHandle } from "~/routes/_auth.login";
 import { getUserSession } from "~/services/auth.server";
 
 export const action: ActionFunction = async ({
@@ -13,6 +18,11 @@ export const action: ActionFunction = async ({
       headers: { "Set-Cookie": await session.commit() },
     }
   );
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+  await fetch(request.url, { method: "POST" });
+  return redirect(loginHandle.path());
 };
 
 export const handle = {
