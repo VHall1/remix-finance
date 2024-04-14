@@ -62,6 +62,10 @@ export default function Login() {
   );
 }
 
+export const handle = {
+  path: () => "/login",
+};
+
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: loginSchema });
