@@ -4,12 +4,12 @@ import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { FormField } from "~/components/form-field";
 import { Button } from "~/components/ui/button";
-import { CardContent, CardHeader } from "~/components/ui/card";
+import { Card, CardContent } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { loginSchema } from "~/schemas/user";
 import { login } from "~/utils/auth.server";
 import { getSession, sessionStorage } from "~/utils/session.server";
-import { AuthCard } from "./_auth/auth-card";
+import { AuthTitle } from "./_auth/auth-title";
 
 export default function Login() {
   const lastResult = useActionData<typeof action>();
@@ -19,47 +19,46 @@ export default function Login() {
       return parseWithZod(formData, { schema: loginSchema });
     },
     shouldValidate: "onBlur",
-    shouldRevalidate: "onInput",
   });
 
   return (
-    <AuthCard>
-      <CardHeader>
-        <h1 className="text-3xl font-bold text-center">Log in</h1>
-      </CardHeader>
-      <CardContent>
-        <Form method="post" id={form.id} onSubmit={form.onSubmit}>
-          <div className="grid gap-4 w-full items-center">
-            <FormField
-              field={fields.email}
-              label="Email"
-              placeholder="hello@example.com"
-              type="email"
-              required
-            />
+    <>
+      <AuthTitle>Log in</AuthTitle>
+      <Card>
+        <CardContent className="pt-6">
+          <Form method="post" id={form.id} onSubmit={form.onSubmit} noValidate>
+            <div className="grid gap-4 w-full items-center">
+              <FormField
+                field={fields.email}
+                label="Email"
+                placeholder="hello@example.com"
+                type="email"
+                required
+              />
 
-            <FormField
-              field={fields.password}
-              label="Password"
-              type="password"
-              required
-            />
+              <FormField
+                field={fields.password}
+                label="Password"
+                type="password"
+                required
+              />
 
-            <Button size="lg">Log in</Button>
-            <div className="text-destructive text-center">{form.errors}</div>
+              <Button size="lg">Log in</Button>
+              <div className="text-destructive text-center">{form.errors}</div>
+            </div>
+          </Form>
+        </CardContent>
+        <Separator />
+        <CardContent className="py-4">
+          <div className="text-center">
+            Don&apos;t have an account?{" "}
+            <Button variant="link" className="p-0" asChild>
+              <Link to="/signup">Sign up</Link>
+            </Button>
           </div>
-        </Form>
-      </CardContent>
-      <Separator />
-      <CardContent className="py-4">
-        <div className="text-center">
-          Don&apos;t have an account?{" "}
-          <Button variant="link" className="p-0" asChild>
-            <Link to="/signup">Sign up</Link>
-          </Button>
-        </div>
-      </CardContent>
-    </AuthCard>
+        </CardContent>
+      </Card>
+    </>
   );
 }
 

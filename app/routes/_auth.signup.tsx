@@ -5,11 +5,12 @@ import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { FormField } from "~/components/form-field";
 import { Button } from "~/components/ui/button";
-import { CardContent, CardHeader } from "~/components/ui/card";
+import { Card, CardContent } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { signUpSchema } from "~/schemas/user";
-import { db } from "~/utils/db.server";
-import { AuthCard } from "./_auth/auth-card";
+import { signUp } from "~/utils/auth.server";
+import { getSession, sessionStorage } from "~/utils/session.server";
+import { AuthTitle } from "./_auth/auth-title";
 
 export default function SignUp() {
   const lastResult = useActionData<typeof action>();
@@ -22,60 +23,60 @@ export default function SignUp() {
   });
 
   return (
-    <AuthCard>
-      <CardHeader>
-        <h1 className="text-3xl font-bold text-center">Sign up</h1>
-      </CardHeader>
-      <CardContent>
-        <Form method="post" id={form.id} onSubmit={form.onSubmit}>
-          <div className="grid gap-4 w-full items-center">
-            <FormField
-              field={fields.email}
-              label="Email"
-              placeholder="hello@example.com"
-              type="email"
-              required
-            />
+    <>
+      <AuthTitle>Sign up</AuthTitle>
+      <Card>
+        <CardContent className="pt-6">
+          <Form method="post" id={form.id} onSubmit={form.onSubmit} noValidate>
+            <div className="grid gap-4 w-full items-center">
+              <FormField
+                field={fields.email}
+                label="Email"
+                placeholder="hello@example.com"
+                type="email"
+                required
+              />
 
-            <div className="flex gap-4">
+              <div className="flex gap-4">
+                <FormField
+                  field={fields.firstName}
+                  label="First name"
+                  placeholder="John"
+                  className="flex-1"
+                  required
+                />
+                <FormField
+                  field={fields.lastName}
+                  label="Last name"
+                  placeholder="Doe"
+                  className="flex-1"
+                  required
+                />
+              </div>
+
               <FormField
-                field={fields.firstName}
-                label="First name"
-                placeholder="John"
-                className="flex-1"
+                field={fields.password}
+                label="Password"
+                type="password"
                 required
               />
-              <FormField
-                field={fields.lastName}
-                label="Last name"
-                placeholder="Doe"
-                className="flex-1"
-                required
-              />
+
+              <Button size="lg">Sign up</Button>
+              <div className="text-destructive text-center">{form.errors}</div>
             </div>
-
-            <FormField
-              field={fields.password}
-              label="Password"
-              type="password"
-              required
-            />
-
-            <Button size="lg">Sign up</Button>
-            <div className="text-destructive text-center">{form.errors}</div>
+          </Form>
+        </CardContent>
+        <Separator />
+        <CardContent className="py-4">
+          <div className="text-center">
+            Already have an account?{" "}
+            <Button variant="link" className="p-0" asChild>
+              <Link to="/login">Log in</Link>
+            </Button>
           </div>
-        </Form>
-      </CardContent>
-      <Separator />
-      <CardContent className="py-4">
-        <div className="text-center">
-          Already have an account?{" "}
-          <Button variant="link" className="p-0" asChild>
-            <Link to="/login">Log in</Link>
-          </Button>
-        </div>
-      </CardContent>
-    </AuthCard>
+        </CardContent>
+      </Card>
+    </>
   );
 }
 
@@ -89,7 +90,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   let user: User;
   try {
-    user = await db.user.signUp({
+    user = await signUp({
       email: submission.value.email,
       firstName: submission.value.firstName,
       lastName: submission.value.lastName,
@@ -112,16 +113,9 @@ export async function action({ request }: ActionFunctionArgs) {
     throw error;
   }
 
-  const session = await getUserSession(request);
-  session.setUser({
-    id: user.id,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    avatar: user.avatar,
-  });
-
+  const session = await getSession(request);
+  session.set("userId", user.id);
   return redirect("/", {
-    headers: { "Set-Cookie": await session.commit() },
+    headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
   });
 }
