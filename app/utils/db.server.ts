@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { userModel } from "~/models/user.server";
 import { singleton } from "~/utils/singleton.server";
 
 function getClient() {
@@ -10,7 +9,7 @@ function getClient() {
       { level: "info", emit: "stdout" },
       { level: "warn", emit: "stdout" },
     ],
-  }).$extends(userModel);
+  });
 
   // make the connection eagerly so the first request doesn't have to wait
   void client.$connect();
