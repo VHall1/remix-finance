@@ -27,9 +27,9 @@
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-toast": "^1.1.5",
-    "@remix-run/node": "^2.8.1",
-    "@remix-run/react": "^2.8.1",
-    "@remix-run/serve": "^2.8.1",
+    "@remix-run/node": "^2.9.2",
+    "@remix-run/react": "^2.9.2",
+    "@remix-run/serve": "^2.9.2",
     "@tanstack/react-table": "^8.15.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
@@ -45,7 +45,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@remix-run/dev": "^2.8.1",
+    "@remix-run/dev": "^2.9.2",
     "@types/bcrypt": "^5.0.2",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
