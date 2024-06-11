@@ -9,7 +9,8 @@
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
-    "compose": "docker-compose -f ./.dev/docker-compose.yml up -d"
+    "compose": "docker-compose -f ./.dev/docker-compose.yml up -d",
+    "prepare": "husky install"
   },
   "overrides": {
     "react": "$react",
@@ -62,6 +63,8 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.6",
     "postcss": "^8.4.38",
     "prisma": "^5.11.0",
     "tailwindcss": "^3.4.3",
@@ -72,5 +75,9 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": "npm run lint",
+    "*.{js,ts,tsx,css,md}": "prettier --write"
   }
 }
