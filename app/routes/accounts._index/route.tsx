@@ -1,10 +1,10 @@
-import { LoaderFunctionArgs, json } from "@remix-run/node";
+import { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { PageHeader } from "~/components/page-header";
 import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
-import { requireUser } from "~/utils/session.server";
 import { db } from "~/utils/db.server";
+import { requireUser } from "~/utils/session.server";
 import { columns } from "./columns";
 
 export default function Accounts() {
@@ -18,9 +18,9 @@ export default function Accounts() {
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const user = await requireUser(request);
+  const userId = await requireUser(request);
   const accounts = await db.account.findMany({
-    where: { userId: user.id },
+    where: { userId },
     select: {
       id: true,
       name: true,
@@ -28,11 +28,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     },
   });
 
-  return json({ accounts });
+  return { accounts };
 };
 
-export const handle = {
-  header: () => (
+export const handle: Handle = {
+  pageHeader: () => (
     <PageHeader path="/" title="Accounts">
       <div className="flex flex-1 items-center">
         <Button className="ml-auto" asChild>

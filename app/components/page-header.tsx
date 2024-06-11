@@ -9,7 +9,7 @@ export function PageHeader({
   children,
 }: PropsWithChildren<PageHeaderProps>) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 mb-6">
       {path ? (
         <Button size="icon" variant="outline" asChild>
           <Link to={path}>

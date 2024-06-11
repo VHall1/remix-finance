@@ -1,5 +1,10 @@
-import { ShellWithOutlet } from "~/components/shell";
+import { Outlet } from "@remix-run/react";
+import { Shell } from "~/components/shell";
 
 export default function Transactions() {
-  return <ShellWithOutlet />;
+  return (
+    <Shell>
+      <Outlet />
+    </Shell>
+  );
 }
