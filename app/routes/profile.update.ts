@@ -2,7 +2,7 @@ import { parseWithZod } from "@conform-to/zod";
 import { $Enums } from "@prisma/client";
 import { ActionFunctionArgs, json } from "@remix-run/node";
 import { z } from "zod";
-import { getUserSession, requireUser } from "~/services/auth.server";
+import { requireUser } from "~/utils/session.server";
 import { db } from "~/utils/db.server";
 
 export const schema = z.object({

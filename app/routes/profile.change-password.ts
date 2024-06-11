@@ -2,13 +2,13 @@ import { parseWithZod } from "@conform-to/zod";
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { z } from "zod";
 import { handle as logoutHandle } from "~/routes/logout";
+import { db } from "~/utils/db.server";
 import {
   comparePassword,
   getUserSession,
   hashPassword,
   requireUser,
-} from "~/services/auth.server";
-import { db } from "~/utils/db.server";
+} from "~/utils/session.server";
 
 export const schema = z.object({
   currentPassword: z.string(),

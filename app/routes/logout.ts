@@ -5,12 +5,12 @@ import type {
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { handle as loginHandle } from "~/routes/_auth.login";
-import { getUserSession } from "~/services/auth.server";
+import { getSession } from "~/utils/session.server";
 
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
-  const session = await getUserSession(request);
+  const session = await getSession(request);
   session.logout();
   return json(
     {},

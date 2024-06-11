@@ -11,8 +11,8 @@ import { z } from "zod";
 import { FormField } from "~/components/form-field";
 import { PageHeader } from "~/components/page-header";
 import { Button } from "~/components/ui/button";
-import { requireUser } from "~/services/auth.server";
 import { db } from "~/utils/db.server";
+import { requireUser } from "~/utils/session.server";
 
 export default function NewAccount() {
   const lastResult = useActionData<typeof action>();

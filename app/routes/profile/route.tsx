@@ -6,7 +6,7 @@ import {
 } from "@remix-run/node";
 import { Shell } from "~/components/shell";
 import { handle as logoutHandle } from "~/routes/logout";
-import { requireUser } from "~/services/auth.server";
+import { requireUser } from "~/utils/session.server";
 import { db } from "~/utils/db.server";
 import { ChangePasswordSection } from "./sections/change-password";
 import { ProfileSection } from "./sections/profile";

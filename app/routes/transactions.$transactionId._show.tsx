@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { requireUser } from "~/services/auth.server";
 import { db } from "~/utils/db.server";
+import { requireUser } from "~/utils/session.server";
 
 export default function Transaction() {
   const { transaction } = useLoaderData<typeof loader>();

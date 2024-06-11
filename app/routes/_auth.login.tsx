@@ -7,8 +7,8 @@ import { Button } from "~/components/ui/button";
 import { CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { loginSchema } from "~/schemas/user";
-import { getUserSession } from "~/services/auth.server";
-import { db } from "~/utils/db.server";
+import { login } from "~/utils/auth.server";
+import { getSession, sessionStorage } from "~/utils/session.server";
 import { AuthCard } from "./_auth/auth-card";
 
 export default function Login() {
@@ -19,6 +19,7 @@ export default function Login() {
       return parseWithZod(formData, { schema: loginSchema });
     },
     shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
   });
 
   return (
@@ -62,10 +63,6 @@ export default function Login() {
   );
 }
 
-export const handle = {
-  path: () => "/login",
-};
-
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: loginSchema });
@@ -74,7 +71,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return json(submission.reply());
   }
 
-  const user = await db.user.login({
+  const user = await login({
     email: submission.value.email,
     password: submission.value.password,
   });
@@ -82,21 +79,14 @@ export async function action({ request }: ActionFunctionArgs) {
   if (!user) {
     return json(
       submission.reply({
-        formErrors: ["Email or password invalid"],
+        formErrors: ["Invalid email or password"],
       })
     );
   }
 
-  const session = await getUserSession(request);
-  session.setUser({
-    id: user.id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    avatar: user.avatar,
-  });
-
+  const session = await getSession(request);
+  session.set("userId", user.id);
   return redirect("/", {
-    headers: { "Set-Cookie": await session.commit() },
+    headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
   });
 }

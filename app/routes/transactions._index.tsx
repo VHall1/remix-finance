@@ -33,9 +33,9 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { handle as newTransactionHandle } from "~/routes/transactions.new";
-import { requireUser } from "~/services/auth.server";
 import { formatMoney } from "~/utils";
 import { db } from "~/utils/db.server";
+import { requireUser } from "~/utils/session.server";
 import { TransactionsHeader } from "./transactions/header";
 
 export default function Transactions() {

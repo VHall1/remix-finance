@@ -6,8 +6,8 @@ import { handle as logoutHandle } from "~/routes/logout";
 import { TransactionsForm } from "~/routes/transactions/form";
 import { TransactionsHeader } from "~/routes/transactions/header";
 import { transactionSchema } from "~/schemas/transaction";
-import { requireUser } from "~/services/auth.server";
 import { db } from "~/utils/db.server";
+import { requireUser } from "~/utils/session.server";
 import { handle as showTransactionHandle } from "./transactions.$transactionId._show";
 import { handle as indexTransactionHandle } from "./transactions._index";
 

@@ -3,7 +3,7 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { PageHeader } from "~/components/page-header";
 import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
-import { requireUser } from "~/services/auth.server";
+import { requireUser } from "~/utils/session.server";
 import { db } from "~/utils/db.server";
 import { columns } from "./columns";
 

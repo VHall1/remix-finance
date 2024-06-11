@@ -8,7 +8,6 @@ import { Button } from "~/components/ui/button";
 import { CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { signUpSchema } from "~/schemas/user";
-import { getUserSession } from "~/services/auth.server";
 import { db } from "~/utils/db.server";
 import { AuthCard } from "./_auth/auth-card";
 

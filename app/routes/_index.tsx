@@ -1,6 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Shell } from "~/components/shell";
-import { requireUser } from "~/services/auth.server";
 
 export default function Dashboard() {
   // const { transactions } = useLoaderData<typeof loader>();
