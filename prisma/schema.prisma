@@ -13,8 +13,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ISO 4217
+enum Currency {
+  CAD
+  EUR
+  GBP
+  USD
+}
+
 model User {
-  id              Int       @id @default(autoincrement())
+  id              String    @id @default(cuid())
   email           String    @unique
   firstName       String
   lastName        String
@@ -27,11 +35,14 @@ model User {
 }
 
 model Account {
-  id           Int           @id @default(autoincrement())
+  id           String        @id @default(cuid())
   name         String
-  balance      Float
+  // Could do BigInt to get 64 bits, but feel like 32 bits are more than enough here
+  // Should cover us up-to about 21 million in balance
+  // 32-bit integer in minor units of the currency
+  balance      Int
   user         User          @relation(fields: [userId], references: [id])
-  userId       Int
+  userId       String
   transactions Transaction[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -43,20 +54,13 @@ enum TransactionDirection {
 }
 
 model Transaction {
-  id        Int                  @id @default(autoincrement())
-  amount    Float
+  id        String               @id @default(cuid())
+  amount    Int
   reference String?
   direction TransactionDirection
   currency  Currency
   account   Account              @relation(fields: [accountId], references: [id])
-  accountId Int
+  accountId String
   createdAt DateTime             @default(now())
   updatedAt DateTime             @updatedAt
-}
-
-enum Currency {
-  CAD
-  EUR
-  GBP
-  USD
 }
