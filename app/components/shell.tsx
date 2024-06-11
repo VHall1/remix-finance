@@ -1,15 +1,15 @@
-import { Link, Outlet, useMatches } from "@remix-run/react";
-import { BellIcon, Terminal } from "lucide-react";
+import { Link, useMatches } from "@remix-run/react";
+import { BellIcon } from "lucide-react";
 import { type PropsWithChildren } from "react";
 import { Aside } from "~/components/aside";
 import { Home } from "~/components/home";
 import { Navbar } from "~/components/navbar";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
-import { useRootData } from "~/hooks/useRootData";
 
 export function Shell({ children }: PropsWithChildren) {
-  const { flash } = useRootData();
+  const matches = useMatches();
+  const match = matches.at(-1);
+  const handle: Handle = match?.handle ?? {};
 
   return (
     <div className="lg:grid h-screen [grid-template-columns:minmax(max-content,16rem)_1fr] [grid-template-rows:max-content_max-content_1fr] [grid-template-areas:'logo_header''aside_flash''aside_main']">
@@ -23,7 +23,7 @@ export function Shell({ children }: PropsWithChildren) {
       </div>
       <Navbar />
       <Aside />
-      {flash ? (
+      {/* {flash ? (
         <div className="pt-6 container [grid-area:flash]">
           <Alert variant={flash.error ? "destructive" : "default"}>
             <Terminal className="h-4 w-4" />
@@ -31,24 +31,11 @@ export function Shell({ children }: PropsWithChildren) {
             <AlertDescription>{flash.description}</AlertDescription>
           </Alert>
         </div>
-      ) : null}
-      <main className="container pt-6 [grid-area:main]">{children}</main>
+      ) : null} */}
+      <main className="container pt-6 [grid-area:main]">
+        {handle.pageHeader ? handle.pageHeader() : null}
+        {children}
+      </main>
     </div>
-  );
-}
-
-export function ShellWithOutlet() {
-  const matches = useMatches();
-  const match = matches[matches.length - 1];
-  const header =
-    match.handle && typeof match.handle === "object" && "header" in match.handle
-      ? match.handle.header
-      : null;
-
-  return (
-    <Shell>
-      {typeof header === "function" ? header() : null}
-      <Outlet />
-    </Shell>
   );
 }

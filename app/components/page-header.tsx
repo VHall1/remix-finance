@@ -10,12 +10,14 @@ export function PageHeader({
 }: PropsWithChildren<PageHeaderProps>) {
   return (
     <div className="flex items-center gap-4">
-      <Button size="icon" variant="outline" asChild>
-        <Link to={path}>
-          <ArrowLeftIcon className="h-4 w-4" />
-          <span className="sr-only">Back</span>
-        </Link>
-      </Button>
+      {path ? (
+        <Button size="icon" variant="outline" asChild>
+          <Link to={path}>
+            <ArrowLeftIcon className="h-4 w-4" />
+            <span className="sr-only">Back</span>
+          </Link>
+        </Button>
+      ) : null}
       <h1 className="font-semibold text-lg md:text-xl">{title}</h1>
       {children}
     </div>
@@ -23,6 +25,6 @@ export function PageHeader({
 }
 
 interface PageHeaderProps {
-  path: string;
+  path?: string;
   title: string;
 }
