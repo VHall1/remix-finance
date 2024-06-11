@@ -59,7 +59,7 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: theme("screens.sm")) {
   .container {
     @apply px-4;
   }
