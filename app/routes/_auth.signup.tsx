@@ -1,7 +1,7 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { Prisma, User } from "@prisma/client";
-import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
+import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { FormField } from "~/components/form-field";
 import { Button } from "~/components/ui/button";
@@ -85,7 +85,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const submission = parseWithZod(formData, { schema: signUpSchema });
 
   if (submission.status !== "success") {
-    return json(submission.reply());
+    return submission.reply();
   }
 
   let user: User;
@@ -103,11 +103,9 @@ export async function action({ request }: ActionFunctionArgs) {
       // (Unique constraint failed)
       // https://www.prisma.io/docs/orm/reference/error-reference#p2002
     ) {
-      return json(
-        submission.reply({
-          formErrors: ["This email address is not available"],
-        })
-      );
+      return submission.reply({
+        formErrors: ["This email address is not available"],
+      });
     }
 
     throw error;

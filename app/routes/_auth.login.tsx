@@ -1,6 +1,6 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
+import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { FormField } from "~/components/form-field";
 import { Button } from "~/components/ui/button";
@@ -67,7 +67,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const submission = parseWithZod(formData, { schema: loginSchema });
 
   if (submission.status !== "success") {
-    return json(submission.reply());
+    return submission.reply();
   }
 
   const user = await login({
@@ -76,11 +76,9 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (!user) {
-    return json(
-      submission.reply({
-        formErrors: ["Invalid email or password"],
-      })
-    );
+    return submission.reply({
+      formErrors: ["Invalid email or password"],
+    });
   }
 
   const session = await getSession(request);
