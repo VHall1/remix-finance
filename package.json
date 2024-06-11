@@ -77,7 +77,7 @@
     "node": ">=18.0.0"
   },
   "lint-staged": {
-    "*.{js,ts,tsx}": "npm run lint",
+    "*.{js,ts,tsx}": "eslint --cache --fix",
     "*.{js,ts,tsx,css,md}": "prettier --write"
   }
 }
