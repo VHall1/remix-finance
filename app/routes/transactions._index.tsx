@@ -34,8 +34,8 @@ import {
 } from "~/components/ui/table";
 import { handle as newTransactionHandle } from "~/routes/transactions.new";
 import { requireUser } from "~/services/auth.server";
-import { prisma } from "~/services/prisma.server";
 import { formatMoney } from "~/utils";
+import { db } from "~/utils/db.server";
 import { TransactionsHeader } from "./transactions/header";
 
 export default function Transactions() {
@@ -228,10 +228,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   const [total, transactions] = await Promise.all([
-    prisma.transaction.count({
+    db.transaction.count({
       where: { userId: user.id },
     }),
-    prisma.transaction.findMany({
+    db.transaction.findMany({
       where: { userId: user.id },
       take,
       skip: page * take,

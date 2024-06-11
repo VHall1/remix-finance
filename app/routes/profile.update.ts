@@ -3,7 +3,7 @@ import { $Enums } from "@prisma/client";
 import { ActionFunctionArgs, json } from "@remix-run/node";
 import { z } from "zod";
 import { getUserSession, requireUser } from "~/services/auth.server";
-import { prisma } from "~/services/prisma.server";
+import { db } from "~/utils/db.server";
 
 export const schema = z.object({
   firstName: z.string(),
@@ -23,7 +23,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const user = await requireUser(request);
   const [session, updatedUser] = await Promise.all([
     getUserSession(request),
-    prisma.user.update({
+    db.user.update({
       where: { id: user.id },
       data: {
         firstName: submission.value.firstName,

@@ -2,12 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { userModel } from "~/models/user.server";
 import { singleton } from "~/utils/singleton.server";
 
-const prisma = singleton("prisma", getClient);
-
 function getClient() {
-  // NOTE: during development if you change anything in this function, remember
-  // that this only runs once per server restart and won't automatically be
-  // re-run per request like everything else is.
   const client = new PrismaClient({
     log: [
       { level: "query", emit: "event" },
@@ -22,4 +17,4 @@ function getClient() {
   return client;
 }
 
-export { prisma };
+export const db = singleton("db-client", getClient);

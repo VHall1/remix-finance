@@ -12,7 +12,7 @@ import { FormField } from "~/components/form-field";
 import { PageHeader } from "~/components/page-header";
 import { Button } from "~/components/ui/button";
 import { requireUser } from "~/services/auth.server";
-import { prisma } from "~/services/prisma.server";
+import { db } from "~/utils/db.server";
 
 export default function NewAccount() {
   const lastResult = useActionData<typeof action>();
@@ -62,12 +62,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return json(submission.reply());
   }
 
-  const fullUser = await prisma.user.findUnique({ where: { id: user.id } });
+  const fullUser = await db.user.findUnique({ where: { id: user.id } });
   if (!fullUser) {
     throw redirect("/logout");
   }
 
-  const account = await prisma.account.create({
+  const account = await db.account.create({
     data: {
       name: submission.value.name,
       balance: submission.value.startingBalance || 0,

@@ -8,7 +8,7 @@ import { CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { loginSchema } from "~/schemas/user";
 import { getUserSession } from "~/services/auth.server";
-import { prisma } from "~/services/prisma.server";
+import { db } from "~/utils/db.server";
 import { AuthCard } from "./_auth/auth-card";
 
 export default function Login() {
@@ -74,7 +74,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return json(submission.reply());
   }
 
-  const user = await prisma.user.login({
+  const user = await db.user.login({
     email: submission.value.email,
     password: submission.value.password,
   });

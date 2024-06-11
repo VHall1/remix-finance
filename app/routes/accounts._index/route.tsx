@@ -1,11 +1,11 @@
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { PageHeader } from "~/components/page-header";
+import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
 import { requireUser } from "~/services/auth.server";
-import { prisma } from "~/services/prisma.server";
+import { db } from "~/utils/db.server";
 import { columns } from "./columns";
-import { Button } from "~/components/ui/button";
 
 export default function Accounts() {
   const { accounts } = useLoaderData<typeof loader>();
@@ -19,7 +19,7 @@ export default function Accounts() {
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUser(request);
-  const accounts = await prisma.account.findMany({
+  const accounts = await db.account.findMany({
     where: { userId: user.id },
     select: {
       id: true,

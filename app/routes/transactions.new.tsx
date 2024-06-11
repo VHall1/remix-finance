@@ -7,7 +7,7 @@ import { TransactionsForm } from "~/routes/transactions/form";
 import { TransactionsHeader } from "~/routes/transactions/header";
 import { transactionSchema } from "~/schemas/transaction";
 import { requireUser } from "~/services/auth.server";
-import { prisma } from "~/services/prisma.server";
+import { db } from "~/utils/db.server";
 import { handle as showTransactionHandle } from "./transactions.$transactionId._show";
 import { handle as indexTransactionHandle } from "./transactions._index";
 
@@ -49,12 +49,12 @@ export async function action({ request }: ActionFunctionArgs) {
     return json(submission.reply());
   }
 
-  const fullUser = await prisma.user.findUnique({ where: { id: user.id } });
+  const fullUser = await db.user.findUnique({ where: { id: user.id } });
   if (!fullUser) {
     throw redirect(logoutHandle.path());
   }
 
-  const transaction = await prisma.transaction.create({
+  const transaction = await db.transaction.create({
     data: {
       amount: submission.value.amount,
       direction: submission.value.direction,

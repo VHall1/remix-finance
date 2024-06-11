@@ -7,7 +7,7 @@ import {
 import { Shell } from "~/components/shell";
 import { handle as logoutHandle } from "~/routes/logout";
 import { requireUser } from "~/services/auth.server";
-import { prisma } from "~/services/prisma.server";
+import { db } from "~/utils/db.server";
 import { ChangePasswordSection } from "./sections/change-password";
 import { ProfileSection } from "./sections/profile";
 
@@ -24,7 +24,7 @@ export default function Profile() {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await requireUser(request);
-  const extraFields = await prisma.user
+  const extraFields = await db.user
     .findUniqueOrThrow({
       where: { id: user.id },
       select: { createdAt: true, defaultCurrency: true },

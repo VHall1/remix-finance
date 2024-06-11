@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { requireUser } from "~/services/auth.server";
-import { prisma } from "~/services/prisma.server";
+import { db } from "~/utils/db.server";
 
 export default function Transaction() {
   const { transaction } = useLoaderData<typeof loader>();
@@ -15,7 +15,7 @@ export const handle = {
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const user = await requireUser(request);
-  const transaction = await prisma.transaction.findUnique({
+  const transaction = await db.transaction.findUnique({
     where: { id: Number(params.transactionId), userId: user.id },
   });
   if (!transaction) {

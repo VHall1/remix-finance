@@ -8,7 +8,7 @@ import {
   hashPassword,
   requireUser,
 } from "~/services/auth.server";
-import { prisma } from "~/services/prisma.server";
+import { db } from "~/utils/db.server";
 
 export const schema = z.object({
   currentPassword: z.string(),
@@ -47,7 +47,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const [session] = await Promise.all([
     getUserSession(request),
-    prisma.user.update({
+    db.user.update({
       where: { id: user.id },
       data: {
         passwordHash: await hashPassword(submission.value.password),

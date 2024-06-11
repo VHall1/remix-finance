@@ -9,7 +9,7 @@ import { CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { signUpSchema } from "~/schemas/user";
 import { getUserSession } from "~/services/auth.server";
-import { prisma } from "~/services/prisma.server";
+import { db } from "~/utils/db.server";
 import { AuthCard } from "./_auth/auth-card";
 
 export default function SignUp() {
@@ -90,7 +90,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   let user: User;
   try {
-    user = await prisma.user.signUp({
+    user = await db.user.signUp({
       email: submission.value.email,
       firstName: submission.value.firstName,
       lastName: submission.value.lastName,
