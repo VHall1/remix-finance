@@ -8,7 +8,6 @@ installGlobals();
 export default defineConfig({
   plugins: [remix(), tsconfigPaths()],
   optimizeDeps: {
-    // https://github.com/pilcrowOnPaper/oslo/issues/25
-    exclude: ["@node-rs/bcrypt"],
+    exclude: ["bcrypt"],
   },
 });
