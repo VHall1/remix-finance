@@ -44,13 +44,13 @@ export function AccountsCard() {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="pb-3">
         <CardTitle>Your Balance</CardTitle>
         <CardDescription>
           Total balance: {formatMoney(totalBalance / 100)}
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-0">
+      <CardContent className="px-0 pb-3">
         <div className="grid">
           {accounts.map((account) => (
             <Button
