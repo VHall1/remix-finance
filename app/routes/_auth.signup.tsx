@@ -1,6 +1,5 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import { Prisma, User } from "@prisma/client";
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { FormField } from "~/components/form-field";
@@ -8,7 +7,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { signUpSchema } from "~/schemas/user";
-import { signUp } from "~/utils/auth.server";
+import { signUp } from "~/services/auth.server";
 import { getSession, sessionStorage } from "~/utils/session.server";
 import { AuthTitle } from "./_auth/auth-title";
 
@@ -90,27 +89,17 @@ export async function action({ request }: ActionFunctionArgs) {
     return submission.reply();
   }
 
-  let user: User;
-  try {
-    user = await signUp({
-      email: submission.value.email,
-      firstName: submission.value.firstName,
-      lastName: submission.value.lastName,
-      password: submission.value.lastName,
-    });
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-      // (Unique constraint failed)
-      // https://www.prisma.io/docs/orm/reference/error-reference#p2002
-    ) {
-      return submission.reply({
-        formErrors: ["This email address is not available"],
-      });
-    }
+  const user = await signUp({
+    email: submission.value.email,
+    firstName: submission.value.firstName,
+    lastName: submission.value.lastName,
+    password: submission.value.lastName,
+  });
 
-    throw error;
+  if (!user) {
+    return submission.reply({
+      formErrors: ["This email address is not available"],
+    });
   }
 
   const session = await getSession(request);

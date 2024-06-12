@@ -7,7 +7,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { loginSchema } from "~/schemas/user";
-import { login } from "~/utils/auth.server";
+import { login } from "~/services/auth.server";
 import { getSession, sessionStorage } from "~/utils/session.server";
 import { AuthTitle } from "./_auth/auth-title";
 
