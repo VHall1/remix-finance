@@ -155,7 +155,8 @@ function AccountForm({ children }: { children: ReactNode }) {
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: addAccountSchema });
     },
-    shouldValidate: "onInput",
+    shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
   });
 
   return (

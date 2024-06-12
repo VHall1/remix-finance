@@ -19,6 +19,7 @@ export default function SignUp() {
       return parseWithZod(formData, { schema: signUpSchema });
     },
     shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
   });
 
   return (
