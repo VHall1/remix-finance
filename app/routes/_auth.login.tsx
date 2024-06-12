@@ -33,6 +33,7 @@ export default function Login() {
                 label="Email"
                 placeholder="hello@example.com"
                 type="email"
+                autoComplete="email"
                 required
               />
 
@@ -40,6 +41,7 @@ export default function Login() {
                 field={fields.password}
                 label="Password"
                 type="password"
+                autoComplete="current-password"
                 required
               />
 

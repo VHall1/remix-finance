@@ -34,6 +34,7 @@ export default function SignUp() {
                 label="Email"
                 placeholder="hello@example.com"
                 type="email"
+                autoComplete="email"
                 required
               />
 
@@ -58,6 +59,7 @@ export default function SignUp() {
                 field={fields.password}
                 label="Password"
                 type="password"
+                autoComplete="new-password"
                 required
               />
 
