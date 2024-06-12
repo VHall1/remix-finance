@@ -4,6 +4,5 @@ const SALT_ROUNDS = 10;
 
 export const hashPassword = (password: string) => hash(password, SALT_ROUNDS);
 
-export const comparePassword = (password: string, hash: string) => {
-  return compare(password, hash);
-};
+export const comparePassword = (password: string, hash: string) =>
+  compare(password, hash);

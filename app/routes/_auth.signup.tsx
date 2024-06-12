@@ -93,7 +93,7 @@ export async function action({ request }: ActionFunctionArgs) {
     email: submission.value.email,
     firstName: submission.value.firstName,
     lastName: submission.value.lastName,
-    password: submission.value.lastName,
+    password: submission.value.password,
   });
 
   if (!user) {
