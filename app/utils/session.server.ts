@@ -30,7 +30,7 @@ export async function requireUser(request: Request) {
   const session = await getSession(request);
   const userId = session.get("userId");
   if (!userId) {
-    throw logout(request);
+    throw await logout(request);
   }
   return userId;
 }
