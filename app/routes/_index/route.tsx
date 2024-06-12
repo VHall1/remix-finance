@@ -1,7 +1,6 @@
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { InboxIcon, PlusIcon } from "lucide-react";
-import { PageHeader } from "~/components/page-header";
 import { Shell } from "~/components/shell";
 import { Button } from "~/components/ui/button";
 import {
@@ -14,45 +13,18 @@ import {
 import { db } from "~/utils/db.server";
 import { formatMoney } from "~/utils/money";
 import { requireUser } from "~/utils/session.server";
+import { AccountsCard } from "./accounts-card";
+import { parseWithZod } from "@conform-to/zod";
+import { addAccountSchema } from "~/schemas/account";
+import { addAccount } from "~/services/account.server";
 
 export default function Dashboard() {
-  const { accounts, recentTransactions, totalBalance } =
-    useLoaderData<typeof loader>();
+  const { recentTransactions } = useLoaderData<typeof loader>();
 
   return (
     <Shell>
       <div className="flex flex-col gap-6">
-        <Card>
-          <CardHeader className="pb-0">
-            <div className="flex justify-between">
-              <div className="grid gap-1.5">
-                <CardTitle>Your Balance</CardTitle>
-                <CardDescription>
-                  Total balance: {formatMoney(totalBalance / 100)}
-                </CardDescription>
-              </div>
-              <Button size="sm">
-                <PlusIcon />
-                Account
-              </Button>
-            </div>
-          </CardHeader>
-          <hr className="mt-5" />
-          <CardContent className="px-0 pb-3">
-            <div className="grid">
-              {accounts.map((account) => (
-                <Button
-                  variant="ghost"
-                  className="h-14 py-0 px-6 rounded-none flex justify-between"
-                  key={account.id}
-                >
-                  <div className="font-semibold">{account.name}</div>
-                  <p>{formatMoney(account.balance / 100)}</p>
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <AccountsCard />
         <Card>
           <CardHeader className="pb-0">
             <div className="flex justify-between">
@@ -110,9 +82,27 @@ export default function Dashboard() {
   );
 }
 
-export const handle: Handle = {
-  pageHeader: () => <PageHeader title="Dashboard" />,
-};
+export async function action({ request }: ActionFunctionArgs) {
+  const userId = await requireUser(request);
+  const formData = await request.formData();
+  const intent = formData.get("intent")?.toString();
+
+  switch (intent) {
+    case "add-account": {
+      const submission = parseWithZod(formData, { schema: addAccountSchema });
+      if (submission.status !== "success") {
+        return submission.reply();
+      }
+      await addAccount(userId, {
+        name: submission.value.name,
+        balance: submission.value.balance,
+      });
+      break;
+    }
+  }
+
+  return null;
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await requireUser(request);
